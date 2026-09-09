@@ -1,0 +1,2710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SCB Wealth — Campaign Effectiveness</title>
+<style>
+  :root {
+    --sidebar-bg: #1a1140; --sidebar-active-bg: #2e1f5e; --sidebar-border: #3a2a6b;
+    --gold: #d9a544; --gold-soft: #e8c37a; --text-light: #ede9f7; --text-muted-sidebar: #9d93c4;
+    --page-bg: #f5f3fb; --card-bg: #ffffff; --card-border: #e6e2f2;
+    --ink: #241a3d; --muted: #6b6486; --navy: #241a3d; --purple: #4a2f8f; --teal: #2f7a8f;
+    --amber: #c9832e; --red: #c0392b; --green: #2f8f5b;
+  }
+  * { box-sizing: border-box; }
+    html { overflow-x: hidden; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Arial, Helvetica, sans-serif; background: var(--page-bg); color: var(--ink); display: flex; min-height: 100vh; overflow-x: hidden; }
+  svg.icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  .sidebar { width: 280px; min-width: 280px; background: var(--sidebar-bg); color: var(--text-light); padding: 22px 18px; display: flex; flex-direction: column; position: relative; transition: width 0.18s ease, min-width 0.18s ease, padding 0.18s ease; }
+  .sidebar.collapsed { width: 76px; min-width: 76px; padding: 22px 10px; }
+  .sidebar-toggle { position: fixed; top: 50%; left: 267px; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 1px solid var(--card-border); color: var(--navy); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; box-shadow: 0 1px 5px rgba(0,0,0,0.18); z-index: 30; }
+  .sidebar.collapsed .sidebar-toggle { left: 63px; }
+  .sidebar.collapsed .brand { justify-content: center; padding: 4px 0 24px; gap: 0; }
+  .sidebar.collapsed .nav-label, .sidebar.collapsed .brand-text, .sidebar.collapsed .chev, .sidebar.collapsed .sidebar-footer { display: none; }
+  .sidebar.collapsed .nav-parent, .sidebar.collapsed .nav-item { justify-content: center; padding: 11px 6px; gap: 0; }
+  .sidebar.collapsed .nav-children { padding-left: 0; }
+  .brand { display: flex; align-items: center; gap: 12px; padding: 4px 6px 24px; }
+  .brand-badge { width: 38px; height: 38px; border-radius: 9px; background: linear-gradient(135deg, var(--gold-soft), var(--gold)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #3a2a08; font-size: 17px; }
+  .brand-name { font-size: 15px; font-weight: 700; line-height: 1.3; }
+  .brand-sub { font-size: 9.5px; letter-spacing: 0.06em; color: var(--gold-soft); font-weight: 600; }
+  .nav-parent { display: flex; align-items: center; gap: 10px; padding: 11px 10px; border-radius: 8px; font-size: 13.5px; font-weight: 700; color: var(--text-light); cursor: pointer; user-select: none; }
+  .nav-parent .chev { margin-left: auto; opacity: 0.6; transform: rotate(180deg); transition: transform 0.15s ease; }
+  .nav-parent .chev.collapsed-icon { transform: rotate(0deg); }
+  .nav-parent-icon { color: var(--gold-soft); }
+  .nav-children { padding-left: 6px; margin: 6px 0 10px; }
+  .nav-item.nav-item-top { font-weight: 700; font-size: 13.5px; padding: 11px 10px; margin-top: 4px; }
+  .nav-item.nav-item-top svg.icon { color: var(--gold-soft); }
+  .nav-item.nav-item-top.active svg.icon { color: var(--gold-soft); }
+
+  .module-frame-wrap { border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; height: calc(100vh - 130px); min-height: 560px; }
+  .module-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+  .nav-children.collapsed { display: none; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; margin: 2px 0; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--text-muted-sidebar); cursor: pointer; }
+  .nav-item.active { background: var(--sidebar-active-bg); border: 1px solid var(--sidebar-border); color: #fff; font-weight: 700; }
+  .nav-item.active svg.icon { color: var(--gold-soft); }
+  .sidebar-footer { margin-top: auto; padding: 16px 8px 4px; font-size: 10.5px; line-height: 1.7; color: #6f6591; border-top: 1px solid var(--sidebar-border); }
+  .sidebar-footer b { color: var(--gold-soft); font-weight: 600; }
+
+  .main { flex: 1; min-width: 0; padding: 32px 40px 60px; max-width: 1300px; }
+  .page-section { display: none; }
+  .page-section.active { display: block; }
+  .top-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; color: var(--amber); margin-bottom: 6px; }
+  h1.page-title { font-family: Georgia, "Times New Roman", serif; font-size: 30px; font-weight: 700; color: var(--navy); margin: 0 0 8px; }
+  .page-desc { font-size: 14px; color: var(--muted); max-width: 640px; margin: 0; }
+  .data-as-of { text-align: right; font-size: 11px; color: var(--muted); }
+  .data-as-of .val { color: var(--navy); font-weight: 700; font-size: 12.5px; margin-top: 2px; }
+  .export-btn { margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--card-border); border-radius: 999px; padding: 8px 16px; font-size: 12.5px; font-weight: 600; color: var(--navy); }
+  .sample-note { font-size: 11px; color: var(--muted); font-style: italic; margin: 4px 0 18px; }
+
+  /* Filter bar */
+  .filter-bar { display: flex; align-items: flex-end; gap: 14px; background: #fff; border: 1px solid var(--card-border); border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; flex-wrap: wrap; }
+  .filter-field { display: flex; flex-direction: column; gap: 5px; min-width: 130px; }
+  .filter-field.grow { flex: 1; min-width: 220px; }
+  .filter-field label { font-size: 10.5px; font-weight: 700; color: var(--muted); letter-spacing: 0.02em; }
+  .filter-field select, .filter-field input {
+    font-size: 12.5px; padding: 7px 10px; border: 1px solid var(--card-border); border-radius: 7px; color: var(--ink); background: #fff; font-family: inherit;
+  }
+  .filter-clear { background: none; border: 1px solid var(--card-border); border-radius: 7px; padding: 8px 14px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; height: 34px; }
+  .showing-chip { font-size: 11.5px; color: var(--purple); font-weight: 600; margin: 0 0 20px 4px; min-height: 16px; }
+
+  .exec-banner { background: linear-gradient(120deg, #2a1a5c, #1b1140); border-radius: 14px; padding: 20px 24px; display: flex; gap: 16px; align-items: flex-start; margin-bottom: 30px; }
+  .exec-icon { width: 34px; height: 34px; min-width: 34px; border-radius: 9px; background: rgba(217,165,68,0.2); color: var(--gold-soft); display: flex; align-items: center; justify-content: center; }
+  .exec-text { font-size: 14px; line-height: 1.6; color: #ded8f2; }
+  .exec-text b { font-family: Georgia, serif; color: #fff; font-size: 15px; }
+  .exec-text .hl { color: var(--gold-soft); font-weight: 700; }
+
+  .section-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--muted); margin: 6px 0 14px; }
+  .section-label .tick { width: 4px; height: 14px; border-radius: 2px; }
+  .tick.amber { background: var(--amber); } .tick.purple { background: var(--purple); } .tick.teal { background: var(--teal); }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 34px; }
+  .kpi-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 18px 20px; border-top: 3px solid transparent; }
+  .kpi-card.navy { border-top-color: var(--navy); } .kpi-card.amber { border-top-color: var(--amber); } .kpi-card.red { border-top-color: var(--red); } .kpi-card.teal { border-top-color: var(--teal); }
+  .kpi-label { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 10px; }
+  .kpi-value { font-size: 28px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .kpi-delta { font-size: 12px; font-weight: 600; }
+  .kpi-delta.bad { color: var(--red); } .kpi-delta.flat { color: var(--muted); }
+
+  .chart-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 34px; }
+  .chart-row.two { grid-template-columns: repeat(2, 1fr); }
+  .chart-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; }
+  .chart-card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .chart-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .chart-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .tag { font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+  .tag.channel { background: #eef0fb; color: #3d3f9e; } .tag.segment { background: #f2ecfb; color: #6a3fa8; } .tag.frequency { background: #fdeceb; color: var(--red); } .tag.trend { background: #eaf4f0; color: var(--teal); } .tag.driver { background: #f2ecfb; color: #6a3fa8; } .tag.builder { background: #fdf3e4; color: var(--amber); }
+  .chart-foot { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .selection-chip { display: none; align-items: center; gap: 6px; background: var(--gold-soft); color: #3a2a08; font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; margin-bottom: 8px; width: fit-content; cursor: pointer; }
+  rect.bar { cursor: pointer; transition: opacity 0.15s ease; }
+  rect.bar-dim { opacity: 0.32; }
+  rect.bar-selected { stroke: var(--gold); stroke-width: 2.5; }
+
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.data-table th { text-align: left; font-size: 11px; letter-spacing: 0.03em; color: var(--muted); font-weight: 700; padding: 10px 14px; border-bottom: 2px solid var(--card-border); }
+  table.data-table td { padding: 11px 14px; border-bottom: 1px solid var(--card-border); color: var(--ink); }
+  table.data-table tr:last-child td { border-bottom: none; }
+  table.data-table tr:hover td { background: #faf9fd; }
+  .card-plain { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 22px 24px; }
+  .status-pill { font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+  .status-pill.on { background: #e9f5ee; color: #2f8f5b; } .status-pill.off { background: #f1efe8; color: #6b6486; }
+  .pilot-row { display: flex; gap: 24px; }
+  .pilot-box { flex: 1; text-align: center; padding: 18px; border-radius: 10px; background: #faf9fd; }
+  .pilot-box .n { font-size: 30px; font-weight: 700; }
+  .pilot-box .l { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .builder-row { display: flex; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .builder-row .filter-field { min-width: 160px; }
+
+  .builder-split { display: flex; gap: 20px; align-items: flex-start; }
+  .builder-panel-col { width: 360px; min-width: 320px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 22px; }
+  .builder-output-col { flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 22px; min-height: 460px; display: flex; flex-direction: column; justify-content: center; }
+  .builder-panel-head { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; align-self: flex-start; width: 100%; }
+  .builder-output-col .builder-panel-head { justify-content: flex-start; }
+  @media (max-width: 1000px) { .builder-split { flex-direction: column; } .builder-panel-col { width: 100%; } }
+  .builder-group { margin-bottom: 20px; }
+  .builder-group-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; color: var(--muted); margin-bottom: 10px; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill-toggle { font-size: 12.5px; font-weight: 600; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--card-border); background: #fff; color: var(--ink); cursor: pointer; }
+  .pill-toggle.selected { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .pill-toggle.single { }
+  .result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .result-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .result-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .result-actions { display: flex; gap: 8px; }
+  .result-btn { background: #fff; border: 1px solid var(--card-border); border-radius: 6px; padding: 6px 12px; font-size: 11.5px; font-weight: 600; color: var(--ink); cursor: pointer; }
+  .result-btn.primary { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .compare-note { display: inline-flex; align-items: center; gap: 6px; background: #eaf4f0; color: var(--teal); font-size: 11.5px; font-weight: 700; padding: 5px 12px; border-radius: 999px; margin-bottom: 14px; }
+  .chart-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 420px; }
+  .chart-type-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 8px; border: 1px solid var(--card-border); border-radius: 10px; background: #fff; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; }
+  .chart-type-tile svg { width: 22px; height: 22px; }
+  .chart-type-tile.selected { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .generate-btn { width: 100%; max-width: 420px; background: var(--purple); color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 4px; }
+  .builder-empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+  .builder-empty-icon { font-size: 32px; margin-bottom: 12px; }
+  .builder-empty-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .builder-empty-sub { font-size: 12.5px; }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; font-size: 11.5px; color: var(--ink); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+  .whatif-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 24px; }
+  .slider-row { margin-bottom: 22px; }
+  .slider-row-head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .slider-row-head .val { color: var(--purple); font-weight: 700; }
+  .slider-row input[type=range] { width: 100%; }
+  .whatif-result { display: flex; gap: 24px; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--card-border); }
+
+/* ===== Customer Activation module (scoped) ===== */
+.ca-module{
+    --bg: var(--page-bg);
+    --panel: var(--card-bg);
+    --panel-alt: #f4f1fb;
+    --border: var(--card-border);
+    --border-strong: #c9c2e6;
+    --text: var(--ink);
+    --text-dim: var(--muted);
+    --text-faint: #9791ab;
+    --green: var(--purple);
+    --green-dark: var(--navy);
+    --green-tint: #f2ecfb;
+    --green-tint-strong: #e3d5f5;
+    --amber: var(--amber);
+    --amber-tint: #fdf3e4;
+    --gray-tier: var(--muted);
+    --gray-tint: #f1efe8;
+    --restricted: var(--red);
+    --restricted-tint: #fdeceb;
+    --focus: var(--purple);
+    --radius: 12px;
+    --shadow: none;
+  }
+.ca-module *{box-sizing:border-box;}
+.ca-module, .ca-module{margin:0;padding:0;}
+.ca-module{
+    background:var(--bg);
+    color:var(--text);
+    font-family: -apple-system, "Segoe UI", Arial, Helvetica, sans-serif;
+    font-size:13.5px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+.ca-module .mono{ font-family:'IBM Plex Mono', monospace; }
+.ca-module button{ font-family:inherit; cursor:pointer; }
+.ca-module select, .ca-module input{ font-family:inherit; font-size:12.5px; }
+.ca-module a{ color:inherit; }
+.ca-module ::selection{ background:var(--green-tint-strong); }
+.ca-module :focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+.ca-module .app{ max-width:1440px; margin:0 auto; padding:0 24px 48px; }
+.ca-module header.top{
+    padding:18px 0 16px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:18px;
+  }
+.ca-module .brandblock h1{
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+.ca-module .brandblock .sub{
+    font-size:12.5px;
+    color:var(--text-dim);
+    margin-top:3px;
+  }
+.ca-module .header-right{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+.ca-module .role-toggle{
+    display:flex;
+    background:var(--panel-alt);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:3px;
+    gap:2px;
+  }
+.ca-module .role-toggle button{
+    border:none;
+    background:transparent;
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--text-dim);
+  }
+.ca-module .role-toggle button.active{
+    background:var(--green);
+    color:#fff;
+  }
+.ca-module .data-flag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--amber);
+    background:var(--amber-tint);
+    border:1px solid #EAD3A3;
+    padding:5px 9px;
+    border-radius:5px;
+    white-space:nowrap;
+  }
+.ca-module .sync-indicator{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:11.5px;
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+.ca-module .sync-dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 0 3px var(--green-tint);
+  }
+.ca-module .flow-strip{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 0 0;
+    flex-wrap:wrap;
+  }
+.ca-module .flow-strip .step{
+    font-size:11px;
+    color:var(--text-dim);
+    background:var(--panel-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:5px;
+    white-space:nowrap;
+  }
+.ca-module .flow-strip .arrow{ color:var(--text-faint); font-size:12px; }
+.ca-module .filterbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:10px 12px;
+    margin-bottom:16px;
+    align-items:center;
+  }
+.ca-module .filterbar .grp{ display:flex; flex-direction:column; gap:3px; }
+.ca-module .filterbar label{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--text-faint);
+    font-weight:600;
+  }
+.ca-module .filterbar select, .ca-module .filterbar input[type=text]{
+    border:1px solid var(--border-strong);
+    border-radius:6px;
+    padding:6px 8px;
+    background:#fff;
+    color:var(--text);
+    min-width:118px;
+  }
+.ca-module .filterbar input[type=text]{ min-width:150px; }
+.ca-module .rm-gate-prompt{
+    text-align:center;
+    padding:56px 24px;
+    background:var(--panel);
+    border:1px dashed var(--border-strong);
+    border-radius:var(--radius);
+    margin-bottom:16px;
+  }
+.ca-module .rm-gate-icon{ font-size:30px; margin-bottom:10px; }
+.ca-module .rm-gate-title{ font-size:16px; font-weight:700; color:var(--text); margin-bottom:6px; }
+.ca-module .rm-gate-sub{ font-size:12.5px; color:var(--text-dim); }
+.ca-module .filter-note{
+    margin-left:auto;
+    font-size:11px;
+    color:var(--restricted);
+    background:var(--restricted-tint);
+    padding:5px 9px;
+    border-radius:6px;
+    display:none;
+  }
+.ca-module .filter-note.show{ display:block; }
+.ca-module .msel{ position:relative; }
+.ca-module .msel-btn{
+    border:1px solid var(--border-strong); border-radius:6px; padding:6px 26px 6px 8px;
+    background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%2354615A'/></svg>") no-repeat right 8px center;
+    color:var(--text); min-width:128px; text-align:left; font-size:12.5px;
+  }
+.ca-module .msel-btn:hover{ border-color:var(--green); }
+.ca-module .msel-panel{
+    display:none; position:absolute; top:calc(100% + 4px); left:0; z-index:60;
+    background:#fff; border:1px solid var(--border-strong); border-radius:8px;
+    box-shadow:0 10px 28px rgba(20,30,24,0.14); padding:6px; min-width:220px; max-height:240px; overflow-y:auto;
+  }
+.ca-module .msel-panel.open{ display:block; }
+.ca-module .msel-opt{ display:flex; align-items:center; gap:8px; font-size:12px; padding:6px 8px; border-radius:5px; cursor:pointer; white-space:nowrap; }
+.ca-module .msel-opt:hover{ background:var(--panel-alt); }
+.ca-module .msel-opt input{ accent-color:var(--green); }
+.ca-module .msel-actions{ border-top:1px solid var(--border); margin-top:4px; padding-top:6px; }
+.ca-module .msel-clear{ border:none; background:none; color:var(--green-dark); font-size:11.5px; font-weight:600; padding:4px 8px; }
+.ca-module .msel-clear:hover{ text-decoration:underline; }
+.ca-module .empty-state{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; color:var(--text-faint); font-size:12.5px; padding:40px 16px;
+    min-height:160px; gap:8px;
+  }
+.ca-module .empty-state .ic{
+    width:34px; height:34px; border-radius:50%; background:var(--panel-alt); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:15px; color:var(--text-faint);
+  }
+.ca-module .empty-state b{ color:var(--text-dim); font-weight:600; }
+.ca-module .action-card{ border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:8px 0 4px; }
+.ca-module .action-row{ display:flex; gap:10px; padding:10px 12px; align-items:flex-start; background:#fff; }
+.ca-module .action-row + .action-row{ border-top:1px solid var(--border); }
+.ca-module .action-row .ic{
+    width:24px; height:24px; border-radius:6px; background:var(--green-tint); color:var(--green-dark);
+    display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; font-weight:700;
+  }
+.ca-module .action-row .body{ min-width:0; }
+.ca-module .action-row .body .k{ font-size:9.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-faint); font-weight:700; margin-bottom:2px; }
+.ca-module .action-row .body .v{ font-size:12px; color:var(--text); line-height:1.4; }
+.ca-module .kpi-row{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:12px;
+    margin-bottom:18px;
+  }
+.ca-module .kpi{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+    position:relative;
+    min-width:0;
+  }
+.ca-module .kpi .lbl{
+    font-size:11px;
+    color:var(--text-dim);
+    display:flex;
+    align-items:center;
+    gap:5px;
+    margin-bottom:8px;
+  }
+.ca-module .info-dot{
+    width:14px; height:14px;
+    border-radius:50%;
+    background:var(--panel-alt);
+    color:var(--text-faint);
+    font-size:9.5px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    border:1px solid var(--border-strong);
+    cursor:help;
+    position:relative;
+  }
+.ca-module .info-dot[data-tip]:hover::after{
+    content:attr(data-tip);
+    position:absolute;
+    bottom:130%;
+    left:0;
+    width:210px;
+    background:#1A241E;
+    color:#fff;
+    font-size:11px;
+    font-weight:400;
+    line-height:1.4;
+    padding:8px 10px;
+    border-radius:6px;
+    z-index:50;
+    box-shadow:0 6px 20px rgba(0,0,0,0.18);
+  }
+.ca-module .kpi .val{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:23px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+.ca-module .kpi .sub{ font-size:11px; color:var(--text-faint); margin-top:4px; }
+.ca-module .grid-row{ display:grid; gap:14px; margin-bottom:14px; }
+.ca-module .grid-2-60-40{ grid-template-columns:1.55fr 1fr; }
+.ca-module .grid-full{ grid-template-columns:1fr; }
+.ca-module .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px 18px 18px;
+    min-width:0;
+  }
+.ca-module .panel-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:12px;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+.ca-module .panel-title{
+    font-size:14px;
+    font-weight:700;
+  }
+.ca-module .panel-title .tag{
+    font-size:10px;
+    color:var(--text-faint);
+    font-weight:500;
+    margin-left:6px;
+  }
+.ca-module .panel-sub{ font-size:11.5px; color:var(--text-dim); margin-top:-6px; margin-bottom:12px; }
+.ca-module .seg-tabs{ display:flex; gap:4px; background:var(--panel-alt); border:1px solid var(--border); border-radius:7px; padding:2px; }
+.ca-module .seg-tabs button{
+    border:none; background:transparent; padding:4px 10px; border-radius:5px; font-size:11px; font-weight:600; color:var(--text-dim);
+  }
+.ca-module .seg-tabs button.active{ background:#fff; color:var(--text); box-shadow:0 1px 2px rgba(0,0,0,0.08); }
+.ca-module .legend{ display:flex; gap:14px; flex-wrap:wrap; font-size:11px; color:var(--text-dim); margin-top:8px;}
+.ca-module .legend .item{ display:flex; align-items:center; gap:5px; }
+.ca-module .swatch{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+.ca-module #qTooltip{
+    position:fixed;
+    display:none;
+    background:#1A241E;
+    color:#fff;
+    padding:9px 11px;
+    border-radius:7px;
+    font-size:11.5px;
+    line-height:1.5;
+    max-width:230px;
+    z-index:100;
+    box-shadow:0 8px 24px rgba(0,0,0,0.22);
+    pointer-events:none;
+  }
+.ca-module #qTooltip b{ color:#fff; }
+.ca-module #qTooltip .mono{ color:#AEE3C9; }
+.ca-module svg text{ font-family:'IBM Plex Sans', sans-serif; }
+.ca-module .quad-label{ font-size:10.5px; fill:var(--text-faint); font-weight:600; }
+.ca-module .quad-prioritise{ fill:var(--green-dark); font-weight:700; font-size:10.5px; }
+.ca-module circle.bubble{ cursor:pointer; transition:opacity .15s; }
+.ca-module circle.bubble:hover{ opacity:0.85; }
+.ca-module circle.bubble.selected{ stroke:#16211C; stroke-width:2.2px; }
+.ca-module .score-block{ display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+.ca-module .score-ring{
+    width:64px; height:64px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace; font-weight:700; font-size:19px;
+    color:#fff; flex-shrink:0;
+  }
+.ca-module .tier-badge{
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:10.5px; font-weight:700; letter-spacing:0.02em;
+    padding:3px 9px; border-radius:999px;
+    text-transform:uppercase;
+  }
+.ca-module .tier-High{ background:var(--green-tint); color:var(--green-dark); }
+.ca-module .tier-Medium{ background:var(--amber-tint); color:var(--amber); }
+.ca-module .tier-Low{ background:var(--gray-tint); color:var(--gray-tier); }
+.ca-module .kv-line{ display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px dashed var(--border); }
+.ca-module .kv-line:last-child{ border-bottom:none; }
+.ca-module .kv-line .k{ color:var(--text-dim); }
+.ca-module .kv-line .v{ font-family:'IBM Plex Mono', monospace; font-weight:600; }
+.ca-module .reasons-list, .ca-module .signals-list{ margin:0; padding-left:18px; font-size:12px; color:var(--text-dim); }
+.ca-module .reasons-list li, .ca-module .signals-list li{ margin-bottom:5px; }
+.ca-module .subhead{ font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-faint); font-weight:700; margin:14px 0 6px; }
+.ca-module .approach-box{ background:var(--panel-alt); border:1px solid var(--border); border-radius:7px; padding:10px 12px; font-size:12px; color:var(--text); }
+.ca-module .callout{
+    background:var(--amber-tint);
+    border:1px solid #E9CE9B;
+    border-radius:7px;
+    padding:11px 13px;
+    margin-top:14px;
+  }
+.ca-module .callout .head{ font-size:11.5px; font-weight:700; color:var(--amber); margin-bottom:5px; }
+.ca-module .callout ul{ margin:6px 0 0; padding-left:18px; font-size:11.5px; color:var(--text-dim); }
+.ca-module .callout ul li{ margin-bottom:4px; }
+.ca-module .approach-pills{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.ca-module .approach-pills span{ font-size:10.5px; background:#fff; border:1px solid #E9CE9B; padding:3px 8px; border-radius:999px; color:var(--text-dim); }
+.ca-module .open-qs{ margin-top:10px; font-size:11.5px; }
+.ca-module .open-qs summary{ cursor:pointer; font-weight:700; color:var(--text-dim); }
+.ca-module .open-qs ul{ margin:8px 0 0; padding-left:18px; color:var(--text-dim); }
+.ca-module .open-qs li{ margin-bottom:5px; }
+.ca-module .prod-row{ display:grid; grid-template-columns:110px 1fr 108px; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--border); }
+.ca-module .prod-row:last-child{ border-bottom:none; }
+.ca-module .prod-name{ font-size:12px; font-weight:600; }
+.ca-module .prod-track{ height:10px; background:var(--panel-alt); border-radius:5px; overflow:hidden; position:relative; border:1px solid var(--border); }
+.ca-module .prod-fill{ height:100%; border-radius:5px 0 0 5px; }
+.ca-module .prod-fill.held{ background:var(--green); width:100%; }
+.ca-module .prod-fill.gap{ background:repeating-linear-gradient(135deg, var(--green-tint-strong), var(--green-tint-strong) 5px, #fff 5px, #fff 10px); width:100%; border:1px dashed var(--green); }
+.ca-module .prod-fill.excluded{ background:repeating-linear-gradient(135deg,#E4E6E3,#E4E6E3 5px,#F4F5F3 5px,#F4F5F3 10px); width:100%; }
+.ca-module .prod-status{ font-size:10.5px; font-weight:600; text-align:right; }
+.ca-module .prod-status.held{ color:var(--green-dark); }
+.ca-module .prod-status.gap{ color:var(--green); }
+.ca-module .prod-status.excluded{ color:var(--text-faint); }
+.ca-module .trend-legend{ display:flex; gap:14px; font-size:11px; color:var(--text-dim); margin-bottom:6px; flex-wrap:wrap; }
+.ca-module .cohort-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 28px; }
+.ca-module .bullet-row{ padding:10px 0; border-bottom:1px solid var(--border); }
+.ca-module .bullet-row .brow-top{ display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:6px; }
+.ca-module .bullet-row .brow-top .lbl{ color:var(--text-dim); font-weight:600; }
+.ca-module .bullet-row .brow-top .val{ font-family:'IBM Plex Mono', monospace; font-weight:700; }
+.ca-module .btrack{ position:relative; height:14px; background:var(--panel-alt); border-radius:4px; border:1px solid var(--border); }
+.ca-module .brange{ position:absolute; top:0; bottom:0; background:var(--green-tint); border-radius:4px; }
+.ca-module .bmedian{ position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--gray-tier); }
+.ca-module .bdot{ position:absolute; top:50%; width:11px; height:11px; border-radius:50%; background:var(--green-dark); border:2px solid #fff; box-shadow:0 0 0 1px var(--green-dark); transform:translate(-50%,-50%); }
+.ca-module .cohort-note{ font-size:11px; color:var(--text-faint); font-style:italic; margin-top:4px; }
+.ca-module .table-wrap{ overflow-x:auto; }
+.ca-module table.data{ width:100%; border-collapse:collapse; font-size:12px; }
+.ca-module table.data thead th{
+    text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.04em;
+    color:var(--text-faint); font-weight:700; padding:7px 10px; border-bottom:2px solid var(--border);
+    cursor:pointer; white-space:nowrap; user-select:none;
+  }
+.ca-module table.data thead th:hover{ color:var(--text-dim); }
+.ca-module table.data thead th.sorted::after{ content:" \2193"; color:var(--green); }
+.ca-module table.data thead th.sorted-asc::after{ content:" \2191"; color:var(--green); }
+.ca-module table.data tbody td{ padding:8px 10px; border-bottom:1px solid var(--border); white-space:nowrap; }
+.ca-module table.data tbody tr{ cursor:pointer; }
+.ca-module table.data tbody tr:hover{ background:var(--panel-alt); }
+.ca-module table.data tbody tr.selected{ background:var(--green-tint); }
+.ca-module table.data tbody tr.restricted{ opacity:0.55; }
+.ca-module .rank-pill{ font-family:'IBM Plex Mono', monospace; font-weight:700; background:var(--panel-alt); border-radius:5px; padding:2px 7px; }
+.ca-module .status-chip{ font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:999px; white-space:nowrap; }
+.ca-module .st-Identified{ background:var(--gray-tint); color:var(--gray-tier); }
+.ca-module .st-Assigned{ background:#E6EEF7; color:#2E5C8A; }
+.ca-module .st-Accepted{ background:#E6EEF7; color:#2E5C8A; }
+.ca-module .st-Contacted{ background:var(--amber-tint); color:var(--amber); }
+.ca-module .st-Meetingscheduled{ background:var(--amber-tint); color:var(--amber); }
+.ca-module .st-Offerpresented{ background:#F1E6F8; color:#6E3B96; }
+.ca-module .st-Invested{ background:var(--green-tint); color:var(--green-dark); }
+.ca-module .st-Followuprequired{ background:var(--amber-tint); color:var(--amber); }
+.ca-module .st-Notinterested{ background:var(--gray-tint); color:var(--text-faint); }
+.ca-module .elig-Eligible{ color:var(--green-dark); font-weight:600; font-size:11px; }
+.ca-module .elig-Restricted{ color:var(--restricted); font-weight:600; font-size:11px; }
+.ca-module .rowbtn{
+    border:1px solid var(--border-strong); background:#fff; border-radius:6px; padding:5px 10px; font-size:11px; font-weight:600; color:var(--text);
+  }
+.ca-module .rowbtn:hover{ background:var(--panel-alt); }
+.ca-module .table-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:11px; color:var(--text-faint); }
+.ca-module .funnel-row{ display:flex; gap:8px; align-items:stretch; }
+.ca-module .fstage{
+    flex:1; background:var(--panel-alt); border:1px solid var(--border); border-radius:7px; padding:12px 10px; text-align:center; position:relative;
+  }
+.ca-module .fstage .n{ font-family:'IBM Plex Mono', monospace; font-size:20px; font-weight:700; }
+.ca-module .fstage .l{ font-size:10.5px; color:var(--text-dim); margin-top:3px; }
+.ca-module .fstage .r{ font-size:10px; color:var(--green-dark); margin-top:4px; font-weight:600; }
+.ca-module .fstage:not(:last-child)::after{
+    content:"›"; position:absolute; right:-13px; top:50%; transform:translateY(-50%);
+    color:var(--text-faint); font-size:16px; z-index:2;
+  }
+.ca-module .funnel-meta{ display:flex; gap:22px; margin-top:14px; flex-wrap:wrap; }
+.ca-module .fmeta-item{ font-size:11.5px; color:var(--text-dim); }
+.ca-module .fmeta-item b{ font-family:'IBM Plex Mono', monospace; color:var(--text); font-size:14px; display:block; margin-bottom:2px; }
+.ca-module .rm-perf{ margin-top:16px; border-top:1px solid var(--border); padding-top:14px; }
+.ca-module .rm-perf table{ width:100%; border-collapse:collapse; font-size:11.5px; }
+.ca-module .rm-perf th{ text-align:left; font-size:10px; text-transform:uppercase; color:var(--text-faint); padding:5px 8px; border-bottom:1px solid var(--border); }
+.ca-module .rm-perf td{ padding:6px 8px; border-bottom:1px solid var(--border); }
+.ca-module .barcell{ background:var(--panel-alt); border-radius:4px; height:8px; position:relative; width:90px; }
+.ca-module .barcell i{ position:absolute; left:0; top:0; bottom:0; background:var(--green); border-radius:4px; display:block; }
+.ca-module .overlay{ position:fixed; inset:0; background:rgba(15,20,17,0.32); display:none; z-index:200; }
+.ca-module .overlay.show{ display:block; }
+.ca-module .drawer{
+    position:fixed; top:0; right:0; height:100%; width:420px; max-width:92vw;
+    background:#fff; box-shadow:-8px 0 30px rgba(0,0,0,0.18);
+    transform:translateX(100%); transition:transform .22s ease; z-index:201;
+    display:flex; flex-direction:column;
+  }
+.ca-module .drawer.show{ transform:translateX(0); }
+.ca-module .drawer-head{ padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; }
+.ca-module .drawer-head h3{ margin:0 0 4px; font-size:15px; }
+.ca-module .drawer-head .meta{ font-size:11.5px; color:var(--text-dim); }
+.ca-module .drawer-close{ border:none; background:var(--panel-alt); width:28px; height:28px; border-radius:50%; font-size:14px; color:var(--text-dim); }
+.ca-module .drawer-body{ padding:16px 20px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:12px; }
+.ca-module .field{ display:flex; flex-direction:column; gap:5px; }
+.ca-module .field label{ font-size:11px; font-weight:700; color:var(--text-dim); }
+.ca-module .field select, .ca-module .field input, .ca-module .field textarea{
+    border:1px solid var(--border-strong); border-radius:6px; padding:8px 9px; font-size:12.5px; width:100%; background:#fff; color:var(--text);
+  }
+.ca-module .field textarea{ min-height:56px; resize:vertical; font-family:inherit; }
+.ca-module .accept-decline{ display:flex; gap:8px; }
+.ca-module .accept-decline button{
+    flex:1; padding:9px; border-radius:7px; font-size:12.5px; font-weight:700; border:1px solid var(--border-strong); background:#fff;
+  }
+.ca-module .accept-decline button.accept{ border-color:var(--green); color:var(--green-dark); }
+.ca-module .accept-decline button.decline{ border-color:var(--restricted); color:var(--restricted); }
+.ca-module .accept-decline button.chosen-accept{ background:var(--green-tint); }
+.ca-module .accept-decline button.chosen-decline{ background:var(--restricted-tint); }
+.ca-module .drawer-foot{ padding:14px 20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.ca-module .save-btn{ background:var(--green); color:#fff; border:none; padding:10px 18px; border-radius:7px; font-size:12.5px; font-weight:700; flex:1; }
+.ca-module .save-btn:hover{ background:var(--green-dark); }
+.ca-module .sync-status{ font-size:11px; color:var(--text-dim); }
+.ca-module .crm-note{ font-size:10.5px; color:var(--text-faint); padding:8px 10px; background:var(--panel-alt); border-radius:6px; }
+.ca-module .toast{
+    position:fixed; bottom:22px; right:22px; background:#16211C; color:#fff; padding:11px 16px; border-radius:8px;
+    font-size:12.5px; box-shadow:0 10px 30px rgba(0,0,0,0.25); z-index:300; display:flex; align-items:center; gap:8px;
+    transform:translateY(12px); opacity:0; pointer-events:none; transition:all .25s ease;
+  }
+.ca-module .toast.show{ transform:translateY(0); opacity:1; }
+.ca-module .toast .dot{ width:7px; height:7px; border-radius:50%; background:#4ADE94; }
+@media (max-width: 1100px){
+.ca-module .grid-2-60-40{ grid-template-columns:1fr; }
+.ca-module .cohort-grid{ grid-template-columns:1fr; }
+.ca-module .kpi-row{ grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<datalist id="customer-options">
+  <option value="Somchai Wattana">
+  <option value="Piyada Chaiyasit">
+  <option value="Narissara Boonmee">
+  <option value="Thanawat Srisuk">
+  <option value="Kanya Pattanakul">
+  <option value="Anucha Ratanakorn">
+  <option value="Suchada Wongsawat">
+  <option value="Krit Chotirat">
+</datalist>
+
+<div class="sidebar" id="app-sidebar">
+  <button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()">&#10094;</button>
+  <div class="brand">
+    <div class="brand-badge">W</div>
+    <div class="brand-text"><div class="brand-name">SCB Wealth</div><div class="brand-sub">WEALTH INTELLIGENCE SUITE</div></div>
+  </div>
+
+  <div class="nav-item nav-item-top active" id="nav-activation" onclick="showSection('activation')">
+    <svg class="icon nav-parent-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/><path d="M17.5 8.5l1.5 1.5 3-3"/></svg>
+    <span class="nav-label">Customer Activation</span>
+  </div>
+
+  <div class="nav-parent" onclick="toggleNavGroup()">
+    <svg class="icon nav-parent-icon" viewBox="0 0 24 24"><path d="M3 12h4l2 5 4-14 2 9h6"/></svg>
+    <span class="nav-label">Campaign Effectiveness</span>
+    <svg class="icon chev collapsed-icon" id="nav-chev-campaign" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="nav-children collapsed" id="nav-children-campaign">
+    <div class="nav-item" id="nav-overview" onclick="showSection('overview')">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span class="nav-label">Overview</span>
+    </div>
+    <div class="nav-item" id="nav-explore" onclick="showSection('explore')">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="nav-label">Explore</span>
+    </div>
+    <div class="nav-item" id="nav-rootcause" onclick="showSection('rootcause')">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.5"/></svg>
+      <span class="nav-label">Root cause</span>
+    </div>
+    <div class="nav-item" id="nav-behavior" onclick="showSection('behavior')">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
+      <span class="nav-label">Behavior Impact</span>
+    </div>
+    <div class="nav-item" id="nav-recommendations" onclick="showSection('recommendations')">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+      <span class="nav-label">Recommendations</span>
+    </div>
+    <div class="nav-item" id="nav-governance" onclick="showSection('governance')">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>
+      <span class="nav-label">Data &amp; governance</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    Business-outcome mashup &middot; <b>Wealth Intelligence Suite</b><br>
+    Data: Qlik Sense &middot;<br>
+    senaps.ap.qlikcloud.com<br>
+    Confidential &mdash; SCB Wealth leadership
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ============ OVERVIEW ============ -->
+  <div class="page-section" id="section-overview">
+    <div class="top-row">
+      <div>
+        <div class="eyebrow">CAMPAIGN EFFECTIVENESS</div>
+        <h1 class="page-title">Overview</h1>
+        <p class="page-desc">Click-through performance across SCB Easy and SCB Connect &mdash; drivers, root cause, and recommended actions.</p>
+      </div>
+      <div>
+        <div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div>
+        <div class="export-btn"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>Export summary</div>
+      </div>
+    </div>
+    <div class="sample-note">Sample data for wireframe reference only. Filters below recompute the KPI row and highlight the matching chart bar.</div>
+
+    <div class="filter-bar-slot" data-prefix="ov"></div>
+
+    <div class="exec-banner">
+      <div class="exec-icon"><svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6z"/></svg></div>
+      <div class="exec-text">
+        <b>Executive message</b><br>
+        <span class="hl">Frequency fatigue is suppressing an estimated 41% of expected clicks</span> across Prime segment sends. <span class="hl">Three campaigns account for 68% of the CTR gap</span> &mdash; a targeting and pacing problem, not a creative one, and fixable without new campaign content.
+      </div>
+    </div>
+
+    <div class="section-label"><span class="tick amber"></span>OVERALL KPIS</div>
+    <div class="kpi-row">
+      <div class="kpi-card navy"><div class="kpi-label">OVERALL CTR</div><div class="kpi-value" id="kpi-ctr">3.4%</div><div class="kpi-delta bad" id="kpi-ctr-delta">&#9660; 0.5 pts vs last month</div></div>
+      <div class="kpi-card teal"><div class="kpi-label">AVG CAMPAIGNS / CUSTOMER (30D)</div><div class="kpi-value" id="kpi-campaigns">4.6</div><div class="kpi-delta bad">&#9650; 0.8 vs last month</div></div>
+      <div class="kpi-card amber"><div class="kpi-label">CLICK-TO-CONVERSION RATE</div><div class="kpi-value" id="kpi-conv">0.9%</div><div class="kpi-delta flat">&#8212; flat vs last month</div></div>
+      <div class="kpi-card red"><div class="kpi-label">FREQUENCY-SUPPRESSED REACH</div><div class="kpi-value" id="kpi-suppressed">38%</div><div class="kpi-delta bad">&#9650; 6 pts vs last month</div></div>
+    </div>
+
+    <div class="section-label"><span class="tick purple"></span>PERFORMANCE BREAKDOWN</div>
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-card-head"><div><div class="chart-title">CTR by Channel</div><div class="chart-sub">Push &middot; Email &middot; In-app</div></div><span class="tag channel">CHANNEL</span></div>
+        <div class="selection-chip" id="chip-channel" onclick="clearChart('channel')"></div>
+        <svg viewBox="0 0 280 180" width="100%">
+          <line x1="20" y1="150" x2="260" y2="150" stroke="#e6e2f2" stroke-width="1"/>
+          <rect class="bar" data-chart="channel" data-label="Push" onclick="selectBar(this)" x="35" y="110" width="46" height="40" rx="4" fill="#241a3d"/>
+          <text x="58" y="103" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">2.1%</text>
+          <text x="58" y="166" text-anchor="middle" font-size="11" fill="#6b6486">Push</text>
+          <rect class="bar" data-chart="channel" data-label="Email" onclick="selectBar(this)" x="117" y="59" width="46" height="91" rx="4" fill="#241a3d"/>
+          <text x="140" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">4.8%</text>
+          <text x="140" y="166" text-anchor="middle" font-size="11" fill="#6b6486">Email</text>
+          <rect class="bar" data-chart="channel" data-label="In-app" onclick="selectBar(this)" x="199" y="30" width="46" height="120" rx="4" fill="#241a3d"/>
+          <text x="222" y="23" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">6.3%</text>
+          <text x="222" y="166" text-anchor="middle" font-size="11" fill="#6b6486">In-app</text>
+        </svg>
+        <div class="chart-foot">In-app leads; push under-performs by 4.2 pts</div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-head"><div><div class="chart-title">CTR by Segment</div><div class="chart-sub">Mass &middot; Affluent &middot; Prime &middot; Private</div></div><span class="tag segment">SEGMENT</span></div>
+        <div class="selection-chip" id="chip-segment" onclick="clearChart('segment')"></div>
+        <svg viewBox="0 0 280 180" width="100%">
+          <line x1="12" y1="150" x2="268" y2="150" stroke="#e6e2f2" stroke-width="1"/>
+          <rect class="bar" data-chart="segment" data-label="Mass" onclick="selectBar(this)" x="24" y="38" width="38" height="112" rx="4" fill="#4a2f8f"/>
+          <text x="43" y="31" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">5.9%</text>
+          <text x="43" y="166" text-anchor="middle" font-size="10.5" fill="#6b6486">Mass</text>
+          <rect class="bar" data-chart="segment" data-label="Affluent" onclick="selectBar(this)" x="90" y="60" width="38" height="90" rx="4" fill="#4a2f8f"/>
+          <text x="109" y="53" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">4.7%</text>
+          <text x="109" y="166" text-anchor="middle" font-size="10.5" fill="#6b6486">Affluent</text>
+          <rect class="bar" data-chart="segment" data-label="Prime" onclick="selectBar(this)" x="156" y="97" width="38" height="53" rx="4" fill="#c0392b"/>
+          <text x="175" y="90" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c0392b">2.8%</text>
+          <text x="175" y="166" text-anchor="middle" font-size="10.5" fill="#6b6486">Prime</text>
+          <rect class="bar" data-chart="segment" data-label="Private" onclick="selectBar(this)" x="222" y="83" width="38" height="67" rx="4" fill="#4a2f8f"/>
+          <text x="241" y="76" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">3.5%</text>
+          <text x="241" y="166" text-anchor="middle" font-size="10.5" fill="#6b6486">Private</text>
+        </svg>
+        <div class="chart-foot">Prime is the weakest segment &mdash; matches executive flag</div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-head"><div><div class="chart-title">CTR by Frequency Bucket</div><div class="chart-sub">Campaigns received, trailing 30 days</div></div><span class="tag frequency">FREQUENCY</span></div>
+        <div class="selection-chip" id="chip-freq" onclick="clearChart('freq')"></div>
+        <svg viewBox="0 0 280 180" width="100%">
+          <line x1="12" y1="150" x2="268" y2="150" stroke="#e6e2f2" stroke-width="1"/>
+          <rect class="bar" data-chart="freq" data-label="1-2 campaigns" onclick="selectBar(this)" x="24" y="30" width="38" height="120" rx="4" fill="#4a2f8f"/>
+          <text x="43" y="23" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">6.5%</text>
+          <text x="43" y="166" text-anchor="middle" font-size="10" fill="#6b6486">1&ndash;2</text>
+          <rect class="bar" data-chart="freq" data-label="3-4 campaigns" onclick="selectBar(this)" x="90" y="60" width="38" height="90" rx="4" fill="#6a4aa8"/>
+          <text x="109" y="53" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">4.9%</text>
+          <text x="109" y="166" text-anchor="middle" font-size="10" fill="#6b6486">3&ndash;4</text>
+          <rect class="bar" data-chart="freq" data-label="5-6 campaigns" onclick="selectBar(this)" x="156" y="93" width="38" height="57" rx="4" fill="#c9832e"/>
+          <text x="175" y="86" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c9832e">3.1%</text>
+          <text x="175" y="166" text-anchor="middle" font-size="10" fill="#6b6486">5&ndash;6</text>
+          <rect class="bar" data-chart="freq" data-label="7+ campaigns" onclick="selectBar(this)" x="222" y="124" width="38" height="26" rx="4" fill="#c0392b"/>
+          <text x="241" y="117" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c0392b">1.4%</text>
+          <text x="241" y="166" text-anchor="middle" font-size="10" fill="#6b6486">7+</text>
+        </svg>
+        <div class="chart-foot">CTR drops 78% from lightest to heaviest contact</div>
+      </div>
+    </div>
+
+    <div class="section-label"><span class="tick teal"></span>CAMPAIGN PERFORMANCE DETAIL</div>
+    <div class="card-plain" style="padding:0; overflow:hidden;">
+      <table class="data-table">
+        <thead><tr><th>Campaign</th><th>Channel</th><th>Segment</th><th>Sends</th><th>CTR</th><th>Conversion</th><th>Avg Frequency (30d)</th></tr></thead>
+        <tbody>
+          <tr><td>Prime Wealth Digest</td><td>Push</td><td>Prime</td><td>18,400</td><td>1.6%</td><td>0.3%</td><td>7.2</td></tr>
+          <tr><td>New Fund Launch</td><td>Email</td><td>Affluent</td><td>22,100</td><td>4.9%</td><td>1.1%</td><td>3.8</td></tr>
+          <tr><td>Portfolio Check-in</td><td>In-app</td><td>Mass</td><td>31,050</td><td>6.7%</td><td>1.4%</td><td>2.1</td></tr>
+          <tr><td>Private Banking Invite</td><td>Push</td><td>Prime</td><td>6,200</td><td>1.9%</td><td>0.4%</td><td>6.5</td></tr>
+          <tr><td>Year-End Review</td><td>Email</td><td>Private</td><td>9,800</td><td>3.9%</td><td>0.9%</td><td>3.0</td></tr>
+          <tr><td>Rate Change Alert</td><td>In-app</td><td>Affluent</td><td>27,300</td><td>5.8%</td><td>1.2%</td><td>2.4</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ EXPLORE ============ -->
+  <div class="page-section" id="section-explore">
+    <div class="top-row">
+      <div>
+        <div class="eyebrow">CAMPAIGN EFFECTIVENESS</div>
+        <h1 class="page-title">Explore</h1>
+        <p class="page-desc">Drill into CTR performance by any dimension, or build a custom view below.</p>
+      </div>
+      <div><div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div></div>
+    </div>
+    <div class="filter-bar-slot" data-prefix="ex"></div>
+
+    <div class="chart-row two">
+      <div class="chart-card">
+        <div class="chart-card-head"><div><div class="chart-title">CTR Trend</div><div class="chart-sub">Weekly, last 8 weeks</div></div><span class="tag trend">TREND</span></div>
+        <svg viewBox="0 0 480 180" width="100%">
+          <line x1="20" y1="150" x2="460" y2="150" stroke="#e6e2f2" stroke-width="1"/>
+          <polyline points="30,52 90,58 150,68 210,80 270,86 330,100 390,105 450,110" fill="none" stroke="#4a2f8f" stroke-width="2.5"/>
+          <circle cx="30" cy="52" r="4" fill="#4a2f8f"/><circle cx="90" cy="58" r="4" fill="#4a2f8f"/><circle cx="150" cy="68" r="4" fill="#4a2f8f"/><circle cx="210" cy="80" r="4" fill="#4a2f8f"/><circle cx="270" cy="86" r="4" fill="#4a2f8f"/><circle cx="330" cy="100" r="4" fill="#4a2f8f"/><circle cx="390" cy="105" r="4" fill="#c0392b"/><circle cx="450" cy="110" r="4" fill="#c0392b"/>
+          <text x="30" y="42" text-anchor="middle" font-size="10.5" fill="#6b6486">4.6%</text>
+          <text x="450" y="100" text-anchor="middle" font-size="10.5" font-weight="700" fill="#c0392b">3.4%</text>
+          <text x="30" y="166" text-anchor="middle" font-size="10" fill="#6b6486">W1</text><text x="450" y="166" text-anchor="middle" font-size="10" fill="#6b6486">W8</text>
+        </svg>
+        <div class="chart-foot">Steady decline since week 5, coinciding with higher send frequency</div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><div><div class="chart-title">CTR by Creative Variant</div><div class="chart-sub">A/B/C, current quarter</div></div><span class="tag channel">CREATIVE</span></div>
+        <div class="selection-chip" id="chip-creative" onclick="clearChart('creative')"></div>
+        <svg viewBox="0 0 280 180" width="100%">
+          <line x1="20" y1="150" x2="260" y2="150" stroke="#e6e2f2" stroke-width="1"/>
+          <rect class="bar" data-chart="creative" data-label="Variant A" onclick="selectBar(this)" x="35" y="70" width="46" height="80" rx="4" fill="#241a3d"/>
+          <text x="58" y="63" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">3.8%</text>
+          <text x="58" y="166" text-anchor="middle" font-size="11" fill="#6b6486">A</text>
+          <rect class="bar" data-chart="creative" data-label="Variant B" onclick="selectBar(this)" x="117" y="87" width="46" height="63" rx="4" fill="#241a3d"/>
+          <text x="140" y="80" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">3.1%</text>
+          <text x="140" y="166" text-anchor="middle" font-size="11" fill="#6b6486">B</text>
+          <rect class="bar" data-chart="creative" data-label="Variant C" onclick="selectBar(this)" x="199" y="74" width="46" height="76" rx="4" fill="#241a3d"/>
+          <text x="222" y="67" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">3.6%</text>
+          <text x="222" y="166" text-anchor="middle" font-size="11" fill="#6b6486">C</text>
+        </svg>
+        <div class="chart-foot">Variants are close &mdash; creative is not the leading driver</div>
+      </div>
+    </div>
+
+    <div class="section-label"><span class="tick amber"></span>BUILD YOUR OWN VIEW</div>
+    <div class="builder-split">
+      <div class="builder-panel-col">
+        <div class="builder-panel-head">&#9881; REPORT BUILDER</div>
+        <div class="builder-group">
+          <div class="builder-group-label">&#128208; DIMENSIONS / ATTRIBUTES <span style="font-weight:500;">(select one or more)</span></div>
+          <div class="pill-row" id="builder-dims">
+            <button class="pill-toggle" data-value="Channel" onclick="togglePill(this)">Channel</button>
+            <button class="pill-toggle" data-value="Segment" onclick="togglePill(this)">Segment</button>
+            <button class="pill-toggle" data-value="Frequency bucket" onclick="togglePill(this)">Frequency bucket</button>
+            <button class="pill-toggle" data-value="Creative" onclick="togglePill(this)">Creative</button>
+          </div>
+        </div>
+        <div class="builder-group">
+          <div class="builder-group-label">&#128202; MEASURES / KPIS <span style="font-weight:500;">(select one or more)</span></div>
+          <div class="pill-row" id="builder-measures">
+            <button class="pill-toggle" data-value="CTR" onclick="togglePill(this)">CTR</button>
+            <button class="pill-toggle" data-value="Conversion rate" onclick="togglePill(this)">Conversion rate</button>
+            <button class="pill-toggle" data-value="Avg frequency" onclick="togglePill(this)">Avg frequency</button>
+            <button class="pill-toggle" data-value="Clicks" onclick="togglePill(this)">Clicks</button>
+            <button class="pill-toggle" data-value="Suppressed reach %" onclick="togglePill(this)">Suppressed reach %</button>
+          </div>
+        </div>
+        <div class="builder-group">
+          <div class="builder-group-label">&#9201; TIME PERIOD</div>
+          <div class="pill-row" id="builder-period">
+            <button class="pill-toggle single" data-value="Last 7 days" onclick="selectSingle(this,'builder-period')">Last 7 days</button>
+            <button class="pill-toggle single selected" data-value="Last 30 days" onclick="selectSingle(this,'builder-period')">Last 30 days</button>
+            <button class="pill-toggle single" data-value="Last 90 days" onclick="selectSingle(this,'builder-period')">Last 90 days</button>
+            <button class="pill-toggle single" data-value="Full quarter" onclick="selectSingle(this,'builder-period')">Full quarter</button>
+          </div>
+        </div>
+        <div class="builder-group">
+          <div class="builder-group-label">&#128256; COMPARISON</div>
+          <div class="pill-row" id="builder-comparison">
+            <button class="pill-toggle single" data-value="WoW Growth" onclick="selectSingle(this,'builder-comparison')">WoW Growth</button>
+            <button class="pill-toggle single" data-value="vs Target" onclick="selectSingle(this,'builder-comparison')">vs Target</button>
+            <button class="pill-toggle single selected" data-value="None" onclick="selectSingle(this,'builder-comparison')">None</button>
+          </div>
+        </div>
+        <div class="builder-group">
+          <div class="builder-group-label">&#128200; CHART TYPE</div>
+          <div class="chart-type-grid" id="builder-chart-types">
+            <button class="chart-type-tile selected" data-type="Bar" onclick="selectChartType(this)">
+              <svg viewBox="0 0 24 24"><rect x="4" y="10" width="4" height="10" fill="currentColor"/><rect x="10" y="5" width="4" height="15" fill="currentColor"/><rect x="16" y="13" width="4" height="7" fill="currentColor"/></svg>
+              Bar
+            </button>
+            <button class="chart-type-tile" data-type="Line" onclick="selectChartType(this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,17 9,10 14,14 20,5"/></svg>
+              Line
+            </button>
+            <button class="chart-type-tile" data-type="Pie" onclick="selectChartType(this)">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 3 A9 9 0 0 1 21 12 L12 12 Z" fill="currentColor"/></svg>
+              Pie
+            </button>
+            <button class="chart-type-tile" data-type="Donut" onclick="selectChartType(this)">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="4.5"/></svg>
+              Donut
+            </button>
+            <button class="chart-type-tile" data-type="H-Bar" onclick="selectChartType(this)">
+              <svg viewBox="0 0 24 24"><rect x="3" y="5" width="15" height="4" fill="currentColor"/><rect x="3" y="11" width="10" height="4" fill="currentColor"/><rect x="3" y="17" width="17" height="4" fill="currentColor"/></svg>
+              H-Bar
+            </button>
+            <button class="chart-type-tile" data-type="Table" onclick="selectChartType(this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="4" x2="9" y2="20"/><line x1="15" y1="4" x2="15" y2="20"/></svg>
+              Table
+            </button>
+          </div>
+        </div>
+        <button class="generate-btn" onclick="renderBuilderChart()">&#9889; Generate Report</button>
+      </div>
+      <div class="builder-output-col" id="builder-output-col">
+        <div class="builder-panel-head">&#128202; REPORT OUTPUT</div>
+        <div id="builder-chart-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ROOT CAUSE ============ -->
+  <div class="page-section" id="section-rootcause">
+    <div class="top-row">
+      <div>
+        <div class="eyebrow">CAMPAIGN EFFECTIVENESS</div>
+        <h1 class="page-title">Root cause</h1>
+        <p class="page-desc">Confirmed drivers of the CTR gap, ranked by contribution and controlled for interaction effects.</p>
+      </div>
+      <div><div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div></div>
+    </div>
+    <div class="filter-bar-slot" data-prefix="rc"></div>
+
+    <div class="chart-card" style="margin-bottom:24px;">
+      <div class="chart-card-head"><div><div class="chart-title">Driver Ranking</div><div class="chart-sub">Mean impact on CTR, percentage points</div></div><span class="tag driver">SHAP RANKED</span></div>
+      <div class="selection-chip" id="chip-driver" onclick="clearChart('driver')"></div>
+      <div id="driver-chart-container"></div>
+      <div class="chart-foot">Ranked using SHAP values, which control for interaction between features &mdash; not a raw correlation.</div>
+    </div>
+
+    <div class="card-plain">
+      <div style="font-weight:700; font-size:15px; margin-bottom:8px;">Top driver: <span id="top-driver-name">Campaigns / 30 days</span></div>
+      <p style="font-size:13.5px; line-height:1.6; color:var(--ink); margin:0;">Customers receiving 7 or more campaigns in a trailing 30-day window show a CTR of 1.4%, against 6.5% for customers receiving 1&ndash;2. This driver alone accounts for roughly twice the impact of the next-ranked factor. This is a correlation-adjusted ranking, not proof of causation &mdash; see Recommendations for how the pilot validates it before scale.</p>
+    </div>
+  </div>
+
+  <!-- ============ BEHAVIOR IMPACT ============ -->
+  <div class="page-section" id="section-behavior">
+    <div class="top-row">
+      <div>
+        <div class="eyebrow">CAMPAIGN EFFECTIVENESS</div>
+        <h1 class="page-title">Behavior Impact</h1>
+        <p class="page-desc">Closing the loop from clicks to money &mdash; how campaign engagement relates to actual transaction and AUM behavior.</p>
+      </div>
+      <div><div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div></div>
+    </div>
+    <div class="sample-note">Sample data for wireframe reference only &mdash; illustrates the kind of insight this view surfaces once connected to real transaction data.</div>
+
+    <div class="section-label"><span class="tick amber"></span>ENGAGEMENT-TO-REVENUE KPIS</div>
+    <div class="kpi-row">
+      <div class="kpi-card navy"><div class="kpi-label">TRANSACTION LIFT, POST-ENGAGEMENT</div><div class="kpi-value">+18.4%</div><div class="kpi-delta" style="color:var(--teal);">&#9650; vs. non-engaged customers</div></div>
+      <div class="kpi-card teal"><div class="kpi-label">AVG AUM GROWTH, ENGAGED VS. NOT</div><div class="kpi-value">+2.4M</div><div class="kpi-delta flat">THB per customer, 90 days</div></div>
+      <div class="kpi-card amber"><div class="kpi-label">DORMANT CUSTOMERS REACTIVATED</div><div class="kpi-value">1,240</div><div class="kpi-delta flat">via a campaign touch, trailing quarter</div></div>
+      <div class="kpi-card red"><div class="kpi-label">REVENUE ATTRIBUTABLE TO CAMPAIGNS</div><div class="kpi-value">~12.6M</div><div class="kpi-delta flat">THB, illustrative estimate</div></div>
+    </div>
+
+    <div class="section-label"><span class="tick purple"></span>DOES ENGAGEMENT ACTUALLY MOVE TRANSACTIONS?</div>
+    <div class="chart-row two">
+      <div class="chart-card">
+        <div class="chart-card-head"><div><div class="chart-title">Transaction Value: Before vs. After Engagement</div><div class="chart-sub">Avg per customer, 30 days pre/post a campaign touch</div></div><span class="tag trend">TRANSACTIONS</span></div>
+        <svg viewBox="0 0 320 200" width="100%">
+          <line x1="20" y1="164" x2="300" y2="164" stroke="#e6e2f2"/>
+          <rect x="35" y="104" width="42" height="60" rx="4" fill="#b4b2a9"/>
+          <text x="56" y="97" text-anchor="middle" font-size="11" font-weight="700" fill="#241a3d">42K</text>
+          <rect x="85" y="94" width="42" height="70" rx="4" fill="#4a2f8f"/>
+          <text x="106" y="87" text-anchor="middle" font-size="11" font-weight="700" fill="#241a3d">49K</text>
+          <text x="81" y="180" text-anchor="middle" font-size="10.5" fill="#6b6486">Not engaged</text>
+
+          <rect x="175" y="98" width="42" height="66" rx="4" fill="#b4b2a9"/>
+          <text x="196" y="91" text-anchor="middle" font-size="11" font-weight="700" fill="#241a3d">45K</text>
+          <rect x="225" y="44" width="42" height="120" rx="4" fill="#0f6e56"/>
+          <text x="246" y="37" text-anchor="middle" font-size="11" font-weight="700" fill="#085041">80K</text>
+          <text x="221" y="180" text-anchor="middle" font-size="10.5" fill="#6b6486">Engaged</text>
+        </svg>
+        <div class="chart-legend"><span class="legend-item"><span class="legend-dot" style="background:#b4b2a9"></span>Pre (30d before)</span><span class="legend-item"><span class="legend-dot" style="background:#4a2f8f"></span>Post, not engaged</span><span class="legend-item"><span class="legend-dot" style="background:#0f6e56"></span>Post, engaged</span></div>
+        <div class="chart-foot">Engaged customers grew transaction value ~4x more than those who didn't engage</div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-head"><div><div class="chart-title">Engagement Rate by Existing Activity Level</div><div class="chart-sub">Does an active transactor even respond to campaigns?</div></div><span class="tag segment">BEHAVIOR</span></div>
+        <svg viewBox="0 0 320 200" width="100%">
+          <line x1="20" y1="164" x2="300" y2="164" stroke="#e6e2f2"/>
+          <rect x="32" y="120" width="42" height="44" rx="4" fill="#c0392b"/>
+          <text x="53" y="113" text-anchor="middle" font-size="11" font-weight="700" fill="#c0392b">2.1%</text>
+          <text x="53" y="180" text-anchor="middle" font-size="10" fill="#6b6486">Dormant</text>
+
+          <rect x="94" y="94" width="42" height="70" rx="4" fill="#c9832e"/>
+          <text x="115" y="87" text-anchor="middle" font-size="11" font-weight="700" fill="#c9832e">4.6%</text>
+          <text x="115" y="180" text-anchor="middle" font-size="10" fill="#6b6486">Low</text>
+
+          <rect x="156" y="60" width="42" height="104" rx="4" fill="#4a2f8f"/>
+          <text x="177" y="53" text-anchor="middle" font-size="11" font-weight="700" fill="#241a3d">7.8%</text>
+          <text x="177" y="180" text-anchor="middle" font-size="10" fill="#6b6486">Moderate</text>
+
+          <rect x="218" y="38" width="42" height="126" rx="4" fill="#0f6e56"/>
+          <text x="239" y="31" text-anchor="middle" font-size="11" font-weight="700" fill="#085041">9.4%</text>
+          <text x="239" y="180" text-anchor="middle" font-size="10" fill="#6b6486">High</text>
+        </svg>
+        <div class="chart-foot">Already-active customers are the most likely to engage &mdash; dormant customers need a different approach entirely</div>
+      </div>
+    </div>
+
+    <div class="section-label"><span class="tick teal"></span>SAMPLE CUSTOMER-LEVEL IMPACT</div>
+    <div class="card-plain" style="padding:0; overflow:hidden;">
+      <table class="data-table">
+        <thead><tr><th>Segment</th><th>Campaign engaged</th><th>Pre-30d transaction value</th><th>Post-30d transaction value</th><th>Delta</th></tr></thead>
+        <tbody>
+          <tr><td>Prime</td><td>Yes</td><td>&#3647;68,000</td><td>&#3647;121,000</td><td style="color:var(--green);font-weight:700;">+78%</td></tr>
+          <tr><td>Prime</td><td>No</td><td>&#3647;71,000</td><td>&#3647;74,000</td><td>+4%</td></tr>
+          <tr><td>Affluent</td><td>Yes</td><td>&#3647;39,000</td><td>&#3647;58,000</td><td style="color:var(--green);font-weight:700;">+49%</td></tr>
+          <tr><td>Affluent</td><td>No</td><td>&#3647;41,000</td><td>&#3647;43,000</td><td>+5%</td></tr>
+          <tr><td>Mass</td><td>Yes</td><td>&#3647;12,000</td><td>&#3647;19,000</td><td style="color:var(--green);font-weight:700;">+58%</td></tr>
+          <tr><td>Mass</td><td>No</td><td>&#3647;13,000</td><td>&#3647;13,500</td><td>+4%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ RECOMMENDATIONS ============ -->
+  <div class="page-section" id="section-recommendations">
+    <div class="top-row">
+      <div>
+        <div class="eyebrow">CAMPAIGN EFFECTIVENESS</div>
+        <h1 class="page-title">Recommendations</h1>
+        <p class="page-desc">Prioritized actions for the marketing team, validated with a control group before scale.</p>
+      </div>
+      <div><div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div></div>
+    </div>
+    <div class="filter-bar-slot" data-prefix="rec"></div>
+
+    <div class="section-label"><span class="tick purple"></span>PRIORITIZED ACTIONS</div>
+    <div class="card-plain" style="padding:0; overflow:hidden; margin-bottom:28px;">
+      <table class="data-table">
+        <thead><tr><th>Segment</th><th>Confirmed driver</th><th>Recommended action</th><th>Expected CTR lift</th><th>Owner</th></tr></thead>
+        <tbody>
+          <tr><td>Prime</td><td>Frequency fatigue</td><td>Cap sends to 2 per month</td><td>+2.1 pts</td><td>Marketing Ops</td></tr>
+          <tr><td>Mass</td><td>Channel mismatch</td><td>Shift push-heavy sends to email / in-app</td><td>+1.0 pts</td><td>Campaign Team</td></tr>
+          <tr><td>Affluent</td><td>Timing mismatch</td><td>Align send time to active hours</td><td>+0.6 pts</td><td>Campaign Team</td></tr>
+          <tr><td>All segments</td><td>Creative variant</td><td>Monitor only &mdash; low impact, no action needed</td><td>&mdash;</td><td>&mdash;</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-label"><span class="tick teal"></span>WHAT-IF SCENARIO ANALYSIS</div>
+    <div class="whatif-card" style="margin-bottom:28px;">
+      <div class="slider-row">
+        <div class="slider-row-head"><span>Frequency cap (campaigns / 30 days)</span><span class="val" id="wi-freq-val">8</span></div>
+        <input type="range" min="1" max="8" step="1" value="8" id="wi-freq" oninput="updateWhatIf()">
+      </div>
+      <div class="slider-row">
+        <div class="slider-row-head"><span>Shift from push to email / in-app</span><span class="val" id="wi-channel-val">0%</span></div>
+        <input type="range" min="0" max="100" step="5" value="0" id="wi-channel" oninput="updateWhatIf()">
+      </div>
+      <div class="slider-row">
+        <div class="slider-row-head"><span>Sends aligned to active hours</span><span class="val" id="wi-time-val">0%</span></div>
+        <input type="range" min="0" max="100" step="5" value="0" id="wi-time" oninput="updateWhatIf()">
+      </div>
+      <div class="whatif-result">
+        <div class="pilot-box"><div class="n" style="color:var(--muted)" id="wi-baseline">3.4%</div><div class="l">Current CTR</div></div>
+        <div class="pilot-box"><div class="n" style="color:var(--teal)" id="wi-predicted">3.4%</div><div class="l">Predicted CTR</div></div>
+        <div class="pilot-box"><div class="n" style="color:var(--green)" id="wi-lift">+0.0 pts</div><div class="l">Projected lift</div></div>
+      </div>
+    </div>
+
+    <div class="section-label"><span class="tick teal"></span>PILOT RESULTS</div>
+    <div class="card-plain">
+      <div class="pilot-row">
+        <div class="pilot-box"><div class="n" style="color:var(--muted)">3.1%</div><div class="l">Control group CTR</div></div>
+        <div class="pilot-box"><div class="n" style="color:var(--teal)">4.2%</div><div class="l">Treatment group CTR (frequency cap applied)</div></div>
+        <div class="pilot-box"><div class="n" style="color:#2f8f5b">+35%</div><div class="l">Relative lift, statistically significant</div></div>
+      </div>
+      <p style="font-size:12.5px; color:var(--muted); margin:16px 0 0;">Pilot run on Prime segment, 4 weeks, holdout control group sized to match treatment. Illustrative figures for wireframe reference.</p>
+    </div>
+  </div>
+
+  <!-- ============ DATA & GOVERNANCE ============ -->
+  <div class="page-section" id="section-governance">
+    <div class="top-row">
+      <div>
+        <div class="eyebrow">CAMPAIGN EFFECTIVENESS</div>
+        <h1 class="page-title">Data &amp; governance</h1>
+        <p class="page-desc">Integration status, refresh cadence, and consent rules underlying this analysis.</p>
+      </div>
+      <div><div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div></div>
+    </div>
+    <div class="filter-bar-slot" data-prefix="gov"></div>
+    <div class="sample-note">Filters above scope the campaign views on other tabs; source-level status below reflects the full pipeline regardless of selection.</div>
+
+    <div class="section-label"><span class="tick purple"></span>DATA SOURCES</div>
+    <div class="card-plain" style="padding:0; overflow:hidden; margin-bottom:28px;">
+      <table class="data-table">
+        <thead><tr><th>Source</th><th>Provides</th><th>Records</th><th>Last refreshed</th><th>Cadence</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>SCB Connect</td><td>Campaign feed: impression, channel, click, creative</td><td>2,410,000</td><td>Today, 05:12</td><td>Every 4 hours</td><td><span class="status-pill on">Connected</span></td></tr>
+          <tr><td>SCB Easy</td><td>Campaign feed: impression, channel, click, creative</td><td>3,120,500</td><td>Today, 05:12</td><td>Every 4 hours</td><td><span class="status-pill on">Connected</span></td></tr>
+          <tr><td>Core banking transactions</td><td>Product holding, activity recency and frequency, AUM tier</td><td>8,760,000</td><td>Today, 02:00</td><td>Daily</td><td><span class="status-pill on">Connected</span></td></tr>
+          <tr><td>CRM / demographics</td><td>Age band, income tier, relationship tier, tenure</td><td>1,180,000</td><td>Yesterday, 22:00</td><td>Daily</td><td><span class="status-pill on">Connected</span></td></tr>
+          <tr><td>External market enrichment</td><td>Industry benchmark data</td><td>&mdash;</td><td>&mdash;</td><td>Not scheduled</td><td><span class="status-pill off">Not enabled</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-label"><span class="tick teal"></span>CONSENT &amp; SUPPRESSION RULES</div>
+    <div class="card-plain">
+      <ul style="margin:0; padding-left:18px; font-size:13.5px; line-height:1.9; color:var(--ink);">
+        <li>Marketing consent required before a customer is included in any targeting list</li>
+        <li>Do-not-contact status and open complaints are excluded automatically</li>
+        <li>Cooling-off period after a recent purchase is respected</li>
+        <li>Frequency cap enforced across all campaigns, not per-campaign in isolation</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ CUSTOMER ACTIVATION ============ -->
+  <div class="page-section active" id="section-activation">
+    <div class="ca-module">
+
+
+<div class="app">
+  <header class="top">
+    <div class="brandblock">
+      <h1>Wealth Customer Activation Intelligence</h1>
+      <div class="sub">Identify, prioritise and activate high-potential customer opportunities</div>
+      <div class="flow-strip">
+        <span class="step">CRM data</span><span class="arrow">→</span>
+        <span class="step">Customer prioritisation</span><span class="arrow">→</span>
+        <span class="step">RM action</span><span class="arrow">→</span>
+        <span class="step">Outcome captured in CRM</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="role-toggle" id="roleToggle">
+        <button data-role="leadership" class="active">Wealth Leadership</button>
+        <button data-role="rm">Individual RM</button>
+      </div>
+      <div class="data-flag">Illustrative synthetic data</div>
+      <div class="sync-indicator"><span class="sync-dot"></span><span id="syncText">CRM synced · just now</span></div>
+    </div>
+  </header>
+
+  <!-- FILTER BAR -->
+  <div class="filterbar" id="filterBar">
+    <div class="grp"><label>Customer ID</label>
+      <div class="msel"><button type="button" class="msel-btn" id="mselIdBtn">All IDs</button>
+        <div class="msel-panel" id="mselIdPanel"></div>
+      </div>
+    </div>
+    <div class="grp"><label>Customer name</label>
+      <div class="msel"><button type="button" class="msel-btn" id="mselNameBtn">All names</button>
+        <div class="msel-panel" id="mselNamePanel"></div>
+      </div>
+    </div>
+    <div class="grp" id="grpBranch"><label>Branch</label><select id="fBranch"><option value="all">All branches</option></select></div>
+    <div class="grp"><label>Segment</label><select id="fSegment"><option value="all">All segments</option></select></div>
+    <div class="grp" id="grpRM"><label>Assigned RM</label><select id="fRM"><option value="all">All RMs</option></select></div>
+    <div class="grp" id="grpRMPicker" style="display:none;">
+      <label>Select RM(s) <span style="color:var(--restricted);font-weight:700;">*required</span></label>
+      <div class="msel"><button type="button" class="msel-btn" id="mselRMBtn">Select RM(s)</button>
+        <div class="msel-panel" id="mselRMPanel"></div>
+      </div>
+    </div>
+    <div class="grp"><label>Contact eligibility</label><select id="fEligibility"><option value="eligible">Eligible only</option><option value="all">All (view only)</option></select></div>
+    <div class="grp"><label>Opportunity tier</label><select id="fTier"><option value="all">All tiers</option><option>High</option><option>Medium</option><option>Low</option></select></div>
+    <div class="grp"><label>Investment status</label><select id="fInvest"><option value="all">All</option><option value="has">Has investment product</option><option value="none">No investment product</option></select></div>
+    <div class="grp"><label>Last contact</label><select id="fLastContact"><option value="all">Any time</option><option value="never">Never contacted</option><option value="30">≤ 30 days</option><option value="90">31–90 days</option><option value="180">91–180 days</option><option value="180+">180+ days</option></select></div>
+    <div class="grp"><label>Action status</label><select id="fStatus"><option value="all">All statuses</option></select></div>
+    <div class="filter-note" id="restrictedNote">Restricted / non-contactable customers are excluded from the actionable population.</div>
+  </div>
+
+  <!-- RM SELECTION GATE PROMPT -->
+  <div class="rm-gate-prompt" id="rmGatePrompt" style="display:none;">
+    <div class="rm-gate-icon">&#128101;</div>
+    <div class="rm-gate-title">Select one or more RMs to continue</div>
+    <div class="rm-gate-sub">Individual RM view shows a specific RM's book &mdash; choose who to view above.</div>
+  </div>
+
+  <div class="main-content-area" id="mainContentArea">
+  <!-- KPI ROW -->
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <!-- ROW A: QUADRANT + PRIORITY PANEL -->
+  <div class="grid-row grid-2-60-40">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Customer opportunity quadrant</div>
+        <div class="legend" id="quadLegend"></div>
+      </div>
+      <div class="panel-sub">Bubble size = current liquid balance · click a customer to view details</div>
+      <svg id="quadSvg" width="100%" height="380" viewBox="0 0 760 380"></svg>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Priority and Next Best Action</div></div>
+      <div id="priorityPanel"></div>
+    </div>
+  </div>
+
+  <!-- ROW B: BEHAVIOUR + PRODUCT POSITION -->
+  <div class="grid-row grid-2-60-40">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Selected customer behaviour <span class="tag" id="behaviourCustLbl"></span></div>
+        <div class="seg-tabs" id="periodTabs">
+          <button data-p="6">6M</button><button data-p="12" class="active">12M</button><button data-p="24">24M</button><button data-p="36">36M</button>
+        </div>
+      </div>
+      <div class="trend-legend" id="trendLegend"></div>
+      <div id="trendEmpty" class="empty-state" style="display:none;"></div>
+      <div id="trendContent">
+        <svg id="trendSvg" width="100%" height="230" viewBox="0 0 680 230"></svg>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Current position &amp; product gaps</div></div>
+      <div id="productPanel"></div>
+      <div class="legend" style="margin-top:12px;">
+        <div class="item"><span class="swatch" style="background:var(--green)"></span>Held</div>
+        <div class="item"><span class="swatch" style="background:var(--green-tint-strong);border:1px dashed var(--green)"></span>Opportunity gap</div>
+        <div class="item"><span class="swatch" style="background:#E4E6E3"></span>Excluded — suitability/eligibility</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW C: COHORT -->
+  <div class="grid-row grid-full">
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Successful Wealth customer cohort comparison <span class="tag" id="cohortCustLbl"></span></div></div>
+      <div class="panel-sub">Comparing selected customer against a cohort of similar customers who successfully became active Wealth investors (matched on segment, wealth band, tenure and risk profile).</div>
+      <div class="cohort-grid" id="cohortGrid"></div>
+      <div class="cohort-note">Successful-customer definition and cohort-matching criteria to be validated with SCB.</div>
+    </div>
+  </div>
+
+  <!-- ROW D: TABLE -->
+  <div class="grid-row grid-full">
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Ranked customer actions</div></div>
+      <div class="table-wrap">
+        <table class="data" id="custTable">
+          <thead><tr>
+            <th data-k="rank">Rank</th>
+            <th data-k="id">Customer</th>
+            <th data-k="segment">Segment</th>
+            <th data-k="eligible">Eligibility</th>
+            <th data-k="score">Score</th>
+            <th data-k="liquidBalance">Liquid balance</th>
+            <th data-k="opportunityAUM">Opportunity AUM</th>
+            <th data-k="trigger">Key trigger</th>
+            <th data-k="reco">Recommended action</th>
+            <th data-k="rmId">Assigned RM</th>
+            <th data-k="lastContactDays">Last contact</th>
+            <th data-k="status">Status</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="custTableBody"></tbody>
+        </table>
+      </div>
+      <div class="table-foot"><span id="tableCount"></span><span>Click a row to select · click a column header to sort</span></div>
+    </div>
+  </div>
+
+  <!-- ROW E: FUNNEL -->
+  <div class="grid-row grid-full">
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Activation funnel <span class="tag" id="funnelScopeLbl"></span></div></div>
+      <div class="funnel-row" id="funnelRow"></div>
+      <div class="funnel-meta" id="funnelMeta"></div>
+      <div class="rm-perf" id="rmPerf" style="display:none;">
+        <div class="subhead" style="margin-top:0;">Performance by RM <span style="text-transform:none;font-weight:500;color:var(--text-faint);">— illustrative</span></div>
+        <table><thead><tr><th>RM</th><th>Assigned</th><th>Contacted</th><th>Invested</th><th>Conversion</th></tr></thead><tbody id="rmPerfBody"></tbody></table>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- tooltip -->
+<div id="qTooltip"></div>
+
+<!-- drawer -->
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div>
+      <h3>Update Customer Action</h3>
+      <div class="meta" id="drawerMeta"></div>
+    </div>
+    <button class="drawer-close" id="drawerClose">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot">
+    <span class="sync-status" id="drawerSyncStatus">Not yet synced</span>
+    <button class="save-btn" id="drawerSave">Save and sync to CRM</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="dot"></span><span id="toastText"></span></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   SEEDED RANDOM (deterministic synthetic data)
+============================================================ */
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return h; }
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* ============================================================
+   REFERENCE DATA
+============================================================ */
+const ALL_PRODUCTS = ['Savings','Current account','Term deposits','Investments','Insurance','Lending'];
+const STATUSES = ['Identified','Assigned','Accepted','Contacted','Meeting scheduled','Offer presented','Invested','Follow-up required','Not interested'];
+const FUNNEL_STAGES = ['Identified','Assigned','Contacted','Meeting scheduled','Offer presented','Invested'];
+const STATUS_RANK = {'Identified':0,'Assigned':1,'Accepted':1,'Contacted':2,'Not interested':2,'Meeting scheduled':3,'Follow-up required':3,'Offer presented':4,'Invested':5};
+
+const RMS = [
+  {id:'rm1', name:'Aunchisa T.', branch:'Bangkok – Silom'},
+  {id:'rm2', name:'Nattakan P.', branch:'Bangkok – Sukhumvit'},
+  {id:'rm3', name:'Peerapat W.', branch:'Chiang Mai'},
+  {id:'rm4', name:'Suchada K.', branch:'Phuket'},
+];
+const CURRENT_RM_ID = 'rm2';
+
+const COHORT_BENCHMARKS = {
+  investRatio:      { label:'Deposit-to-investment ratio', unit:'%', min:45, max:80, median:62, domainMax:100, fmt:v=>Math.round(v)+'%' },
+  liquidBalance:     { label:'Average liquid balance', unit:'THB', min:2000000, max:9000000, median:5200000, domainMax:13000000, fmt:v=>fmtTHBShort(v) },
+  transferIntensity: { label:'External-transfer intensity', unit:'idx', min:5, max:35, median:18, domainMax:60, fmt:v=>Math.round(v)+' idx', invert:true },
+  productPenetration:{ label:'Product penetration', unit:'%', min:50, max:83, median:67, domainMax:100, fmt:v=>Math.round(v)+'%' },
+  digitalEngagement: { label:'Digital engagement score', unit:'', min:55, max:90, median:71, domainMax:100, fmt:v=>Math.round(v) },
+  rmInteractions:    { label:'RM interactions (12m)', unit:'', min:3, max:9, median:5, domainMax:12, fmt:v=>Math.round(v)+'x' },
+};
+
+/* ============================================================
+   CUSTOMER DATASET (illustrative synthetic data)
+============================================================ */
+const RAW_CUSTOMERS = [
+  { id:'CUST-1042', name:'Somchai K.', segment:'Priority Banking', branch:'Bangkok – Silom', rmId:'rm1', eligible:true,
+    likelihood:82, liquidBalance:4200000, opportunityAUM:3100000, trigger:'Term deposit maturing in 30 days',
+    status:'Identified', lastContactDays:null, held:['Savings','Current account','Term deposits'], excluded:[],
+    investRatio:28, transferIntensity:14, digitalEngagement:64, rmInteractions:2, existingCRMReco:null,
+    tenure:'6 yrs', risk:'Balanced', crmSegNote:'Age 44–50 · Bangkok metro' },
+
+  { id:'CUST-1077', name:'Ratana S.', segment:'Wealth Signature', branch:'Bangkok – Sukhumvit', rmId:'rm2', eligible:true,
+    likelihood:74, liquidBalance:7800000, opportunityAUM:5600000, trigger:'Persistent external transfers (3 months)',
+    status:'Assigned', lastContactDays:45, held:['Savings','Current account'], excluded:['Lending'],
+    investRatio:19, transferIntensity:41, digitalEngagement:58, rmInteractions:3, existingCRMReco:'Salesforce: "Review liquidity allocation" (Mar)',
+    tenure:'11 yrs', risk:'Moderate', crmSegNote:'Age 51–58 · Bangkok metro' },
+
+  { id:'CUST-1103', name:'Kittipong N.', segment:'Emerging Affluent', branch:'Chiang Mai', rmId:'rm3', eligible:true,
+    likelihood:65, liquidBalance:1900000, opportunityAUM:1200000, trigger:'Rising idle balance',
+    status:'Contacted', lastContactDays:12, held:['Savings','Current account'], excluded:[],
+    investRatio:12, transferIntensity:9, digitalEngagement:77, rmInteractions:4, existingCRMReco:null,
+    tenure:'3 yrs', risk:'Growth', crmSegNote:'Age 30–36 · Upcountry' },
+
+  { id:'CUST-1118', name:'Wilai P.', segment:'Priority Banking', branch:'Phuket', rmId:'rm4', eligible:true,
+    likelihood:58, liquidBalance:2600000, opportunityAUM:1450000, trigger:'Significant cash inflow',
+    status:'Meeting scheduled', lastContactDays:5, held:['Savings','Current account','Insurance'], excluded:[],
+    investRatio:22, transferIntensity:11, digitalEngagement:52, rmInteractions:5, existingCRMReco:'Salesforce: "Insurance renewal upsell"',
+    tenure:'8 yrs', risk:'Balanced', crmSegNote:'Age 45–52 · Resort province' },
+
+  { id:'CUST-1129', name:'Anong T.', segment:'Wealth Signature', branch:'Bangkok – Silom', rmId:'rm1', eligible:true,
+    likelihood:88, liquidBalance:9500000, opportunityAUM:6800000, trigger:'Term deposit maturing in 14 days',
+    status:'Offer presented', lastContactDays:3, held:['Savings','Current account','Term deposits','Insurance'], excluded:[],
+    investRatio:31, transferIntensity:17, digitalEngagement:69, rmInteractions:6, existingCRMReco:'Salesforce: "TD reinvestment — balanced fund"',
+    tenure:'14 yrs', risk:'Moderate', crmSegNote:'Age 55–62 · Bangkok metro' },
+
+  { id:'CUST-1150', name:'Chaiwat R.', segment:'Emerging Affluent', branch:'Bangkok – Sukhumvit', rmId:'rm2', eligible:true,
+    likelihood:41, liquidBalance:850000, opportunityAUM:420000, trigger:'Recent RM engagement',
+    status:'Invested', lastContactDays:60, held:['Savings','Current account','Investments'], excluded:[],
+    investRatio:58, transferIntensity:8, digitalEngagement:81, rmInteractions:7, existingCRMReco:null,
+    tenure:'2 yrs', risk:'Growth', crmSegNote:'Age 27–33 · Bangkok metro' },
+
+  { id:'CUST-1163', name:'Duangkamol J.', segment:'Priority Banking', branch:'Chiang Mai', rmId:'rm3', eligible:true,
+    likelihood:69, liquidBalance:3300000, opportunityAUM:1900000, trigger:'Persistent external transfers',
+    status:'Follow-up required', lastContactDays:20, held:['Savings','Current account','Term deposits'], excluded:[],
+    investRatio:24, transferIntensity:33, digitalEngagement:47, rmInteractions:3, existingCRMReco:null,
+    tenure:'9 yrs', risk:'Balanced', crmSegNote:'Age 48–55 · Upcountry' },
+
+  { id:'CUST-1181', name:'Prasit W.', segment:'Private Wealth', branch:'Phuket', rmId:'rm4', eligible:true,
+    likelihood:76, liquidBalance:12400000, opportunityAUM:8900000, trigger:'Significant cash inflow',
+    status:'Accepted', lastContactDays:30, held:['Savings','Current account','Term deposits','Investments'], excluded:[],
+    investRatio:44, transferIntensity:15, digitalEngagement:73, rmInteractions:4, existingCRMReco:'Salesforce: "Liquidity event — asset consolidation"',
+    tenure:'17 yrs', risk:'Moderate', crmSegNote:'Age 58–65 · Resort province' },
+
+  { id:'CUST-1196', name:'Ratchanee B.', segment:'Emerging Affluent', branch:'Bangkok – Silom', rmId:'rm2', eligible:true,
+    likelihood:33, liquidBalance:610000, opportunityAUM:260000, trigger:'Rising idle balance',
+    status:'Not interested', lastContactDays:90, held:['Savings'], excluded:['Lending'],
+    investRatio:6, transferIntensity:6, digitalEngagement:39, rmInteractions:2, existingCRMReco:null,
+    tenure:'1 yr', risk:'Conservative', crmSegNote:'Age 25–29 · Bangkok metro' },
+
+  { id:'CUST-1204', name:'Sombat L.', segment:'Priority Banking', branch:'Bangkok – Sukhumvit', rmId:'rm1', eligible:true,
+    likelihood:55, liquidBalance:1750000, opportunityAUM:980000, trigger:'Recent RM engagement',
+    status:'Assigned', lastContactDays:null, held:['Savings','Current account'], excluded:[],
+    investRatio:17, transferIntensity:10, digitalEngagement:61, rmInteractions:1, existingCRMReco:null,
+    tenure:'5 yrs', risk:'Balanced', crmSegNote:'Age 38–44 · Bangkok metro' },
+
+  { id:'CUST-1215', name:'Niran C.', segment:'Priority Banking', branch:'Chiang Mai', rmId:null, eligible:false,
+    eligibilityReason:'Regulatory hold — do-not-contact flag on file', likelihood:60, liquidBalance:2100000, opportunityAUM:1300000,
+    trigger:'Rising idle balance', status:'Identified', lastContactDays:null, held:['Savings'], excluded:[],
+    investRatio:15, transferIntensity:12, digitalEngagement:44, rmInteractions:0, existingCRMReco:null,
+    tenure:'4 yrs', risk:'Balanced', crmSegNote:'Age 40–46 · Upcountry' },
+
+  { id:'CUST-1233', name:'Malee V.', segment:'Wealth Signature', branch:'Phuket', rmId:null, eligible:false,
+    eligibilityReason:'KYC review pending — not eligible for investment offers', likelihood:70, liquidBalance:5400000, opportunityAUM:3600000,
+    trigger:'Significant cash inflow', status:'Identified', lastContactDays:null, held:['Savings','Current account'], excluded:['Investments','Insurance'],
+    investRatio:9, transferIntensity:20, digitalEngagement:55, rmInteractions:0, existingCRMReco:null,
+    tenure:'2 yrs', risk:'Unassessed', crmSegNote:'Age 33–39 · Resort province' },
+];
+
+// derive gap products + score + tier
+const MAX_AUM_FOR_SCORE = 9000000;
+RAW_CUSTOMERS.forEach(c=>{
+  c.gap = ALL_PRODUCTS.filter(p=> !c.held.includes(p) && !c.excluded.includes(p));
+  const scoreRaw = c.likelihood*0.5 + Math.min(100,(c.opportunityAUM/MAX_AUM_FOR_SCORE*100))*0.5;
+  c.score = Math.round(scoreRaw);
+  c.tier = c.score>=70 ? 'High' : c.score>=45 ? 'Medium' : 'Low';
+});
+
+/* ============================================================
+   STATE
+============================================================ */
+let state = {
+  role:'leadership',
+  selectedId: null,
+  selectedRMs: [],
+  trendPeriod:12,
+  sortKey:'score', sortDir:'desc',
+  filters:{ customerIds:[], customerNames:[], branch:'all', segment:'all', rm:'all', eligibility:'eligible', tier:'all', invest:'all', lastContact:'all', status:'all' },
+};
+
+/* ============================================================
+   HELPERS
+============================================================ */
+function fmtTHBFull(n){ return 'THB ' + Math.round(n).toLocaleString('en-US'); }
+function fmtTHBShort(n){
+  if(n>=1000000) return 'THB ' + (n/1000000).toFixed(2).replace(/\.00$/,'').replace(/0$/,'') + 'M';
+  if(n>=1000) return 'THB ' + Math.round(n/1000) + 'K';
+  return 'THB ' + Math.round(n);
+}
+function rmName(id){ const r=RMS.find(x=>x.id===id); return r?r.name:'Unassigned'; }
+function rmBranch(id){ const r=RMS.find(x=>x.id===id); return r?r.branch:'—'; }
+function statusClass(s){ return 'st-'+s.replace(/[^a-zA-Z]/g,''); }
+function lastContactLabel(d){
+  if(d===null||d===undefined) return 'Never';
+  if(d<=30) return d+'d ago';
+  if(d<=90) return d+'d ago';
+  if(d<=180) return d+'d ago';
+  return d+'d ago';
+}
+function lastContactBucket(d){
+  if(d===null||d===undefined) return 'never';
+  if(d<=30) return '30';
+  if(d<=90) return '90';
+  if(d<=180) return '180';
+  return '180+';
+}
+function recommendedAction(c){
+  if(c.trigger.includes('Term deposit')) return 'Discuss TD reinvestment options';
+  if(c.trigger.includes('external transfers')) return 'Portfolio consolidation review';
+  if(c.trigger.includes('cash inflow')) return 'Liquidity allocation discussion';
+  if(c.trigger.includes('idle balance')) return 'Diversification conversation';
+  return 'Relationship review call';
+}
+
+/* ============================================================
+   POPULATE FILTER DROPDOWNS
+============================================================ */
+function uniq(arr){ return [...new Set(arr)]; }
+function populateSelect(sel, values, keepFirst){
+  const first = sel.querySelector('option');
+  sel.innerHTML='';
+  if(keepFirst) sel.appendChild(first);
+  values.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
+}
+(function initFilters(){
+  populateSelect(document.getElementById('fBranch'), uniq(RAW_CUSTOMERS.map(c=>c.branch)).sort(), true);
+  populateSelect(document.getElementById('fSegment'), uniq(RAW_CUSTOMERS.map(c=>c.segment)).sort(), true);
+  populateSelect(document.getElementById('fRM'), RMS.map(r=>r.name), true);
+  // rebuild fRM with id values
+  const fRM = document.getElementById('fRM');
+  fRM.innerHTML='<option value="all">All RMs</option>' + RMS.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  populateSelect(document.getElementById('fStatus'), STATUSES, true);
+})();
+
+/* ============================================================
+   FILTER + SORT LOGIC
+============================================================ */
+function scopedCustomers(){
+  if(state.role==='rm'){
+    if(!state.selectedRMs.length) return [];
+    return RAW_CUSTOMERS.filter(c=>state.selectedRMs.includes(c.rmId));
+  }
+  return RAW_CUSTOMERS.slice();
+}
+function filteredCustomers(){
+  const f = state.filters;
+  let list = scopedCustomers();
+  const anyRestricted = list.some(c=>!c.eligible);
+  document.getElementById('restrictedNote').classList.toggle('show', anyRestricted && f.eligibility==='all');
+
+  if(f.eligibility==='eligible') list = list.filter(c=>c.eligible);
+  if(f.customerIds.length) list = list.filter(c=> f.customerIds.includes(c.id));
+  if(f.customerNames.length) list = list.filter(c=> f.customerNames.includes(c.name));
+  if(f.branch!=='all') list = list.filter(c=>c.branch===f.branch);
+  if(f.segment!=='all') list = list.filter(c=>c.segment===f.segment);
+  if(f.rm!=='all') list = list.filter(c=>c.rmId===f.rm);
+  if(f.tier!=='all') list = list.filter(c=>c.tier===f.tier);
+  if(f.invest==='has') list = list.filter(c=>c.held.includes('Investments'));
+  if(f.invest==='none') list = list.filter(c=>!c.held.includes('Investments'));
+  if(f.lastContact!=='all') list = list.filter(c=> lastContactBucket(c.lastContactDays)===f.lastContact);
+  if(f.status!=='all') list = list.filter(c=>c.status===f.status);
+  return list;
+}
+function sortedList(list){
+  const {sortKey, sortDir} = state;
+  const dir = sortDir==='asc' ? 1 : -1;
+  return list.slice().sort((a,b)=>{
+    let av, bv;
+    if(sortKey==='rank'){ av=a.score; bv=b.score; }
+    else if(sortKey==='rmId'){ av=rmName(a.rmId); bv=rmName(b.rmId); }
+    else if(sortKey==='eligible'){ av=a.eligible?1:0; bv=b.eligible?1:0; }
+    else if(sortKey==='trigger'||sortKey==='reco'){ av=recommendedAction(a); bv=recommendedAction(b); }
+    else { av=a[sortKey]; bv=b[sortKey]; }
+    if(typeof av==='string') { av=av||''; bv=bv||''; return av.localeCompare(bv)*dir; }
+    av = (av===null||av===undefined) ? -Infinity : av;
+    bv = (bv===null||bv===undefined) ? -Infinity : bv;
+    return (av-bv)*dir;
+  });
+}
+
+/* ============================================================
+   RENDER: KPIs
+============================================================ */
+function renderKPIs(list){
+  const eligibleList = list.filter(c=>c.eligible);
+  const totalLiquid = eligibleList.reduce((s,c)=>s+c.liquidBalance,0);
+  const totalOpp = eligibleList.reduce((s,c)=>s+c.opportunityAUM,0);
+  const highCount = eligibleList.filter(c=>c.tier==='High').length;
+
+  const kpis = [
+    { lbl:'Eligible opportunity customers', val: eligibleList.length, sub:(list.length-eligibleList.length)+' excluded (restricted)', tip:'Customers who are contact-eligible and match the current filters. Restricted or non-contactable customers are excluded by design.' },
+    { lbl:'Current liquid balances', val: fmtTHBShort(totalLiquid), sub:'Sum across eligible customers', tip:'Total current deposit/savings balances held by eligible customers today, based on account data.' },
+    { lbl:'Estimated opportunity AUM', val: fmtTHBShort(totalOpp), sub:'Analytical estimate — not confirmed assets', tip:'A modelled estimate of investable assets that could plausibly move to SCB. This is an analytical estimate, not a confirmed customer asset figure.' },
+    { lbl:'High-priority customers', val: highCount, sub:'Tier: High (score ≥ 70)', tip:'Customers whose Activation Opportunity Score places them in the High tier, based on likelihood and estimated opportunity size.' },
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
+    <div class="kpi">
+      <div class="lbl">${k.lbl} <span class="info-dot" data-tip="${k.tip}">i</span></div>
+      <div class="val">${k.val}</div>
+      <div class="sub">${k.sub}</div>
+    </div>`).join('');
+}
+
+/* ============================================================
+   RENDER: QUADRANT
+============================================================ */
+const PAD = {l:46,r:20,t:16,b:36};
+const QW=760, QH=380;
+function qx(l){ return PAD.l + (l/100)*(QW-PAD.l-PAD.r); }
+function qy(aum){ const maxA=10000000; return QH-PAD.b - (Math.min(aum,maxA)/maxA)*(QH-PAD.t-PAD.b); }
+function qr(bal){ const maxB=13000000; return 6 + Math.sqrt(Math.min(bal,maxB)/maxB)*20; }
+function tierFill(t){ return t==='High' ? '#0E7C5A' : t==='Medium' ? '#C9902E' : '#8A958D'; }
+
+function renderQuadrant(list){
+  const svg = document.getElementById('quadSvg');
+  const midX = qx(50), midY = qy(3500000);
+  let s = '';
+  // axes area
+  s += `<rect x="0" y="0" width="${QW}" height="${QH}" fill="#FCFDFC"/>`;
+  s += `<line x1="${PAD.l}" y1="${QH-PAD.b}" x2="${QW-PAD.r}" y2="${QH-PAD.b}" stroke="#C7D1CA"/>`;
+  s += `<line x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${QH-PAD.b}" stroke="#C7D1CA"/>`;
+  s += `<line x1="${midX}" y1="${PAD.t}" x2="${midX}" y2="${QH-PAD.b}" stroke="#E2E7E3" stroke-dasharray="3,4"/>`;
+  s += `<line x1="${PAD.l}" y1="${midY}" x2="${QW-PAD.r}" y2="${midY}" stroke="#E2E7E3" stroke-dasharray="3,4"/>`;
+  s += `<text x="${QW/2}" y="${QH-10}" text-anchor="middle" class="quad-label">Likelihood to invest →</text>`;
+  s += `<text x="14" y="${QH/2}" text-anchor="middle" class="quad-label" transform="rotate(-90 14 ${QH/2})">Estimated opportunity AUM →</text>`;
+  s += `<text x="${QW-PAD.r-4}" y="${PAD.t+14}" text-anchor="end" class="quad-prioritise">High propensity / High opportunity — Prioritise</text>`;
+
+  list.filter(c=>c.eligible).forEach(c=>{
+    const cx=qx(c.likelihood), cy=qy(c.opportunityAUM), r=qr(c.liquidBalance);
+    const sel = c.id===state.selectedId ? ' selected':'';
+    s += `<circle class="bubble${sel}" data-id="${c.id}" cx="${cx}" cy="${cy}" r="${r}" fill="${tierFill(c.tier)}" fill-opacity="0.72" stroke="${tierFill(c.tier)}" stroke-width="1"/>`;
+  });
+  svg.innerHTML = s;
+
+  document.getElementById('quadLegend').innerHTML = `
+    <div class="item"><span class="swatch" style="background:#0E7C5A"></span>High</div>
+    <div class="item"><span class="swatch" style="background:#C9902E"></span>Medium</div>
+    <div class="item"><span class="swatch" style="background:#8A958D"></span>Low</div>`;
+
+  svg.querySelectorAll('.bubble').forEach(el=>{
+    el.addEventListener('click', ()=>{ selectCustomer(el.getAttribute('data-id')); });
+    el.addEventListener('mousemove', (e)=> showTooltip(e, el.getAttribute('data-id')) );
+    el.addEventListener('mouseleave', hideTooltip );
+  });
+}
+function showTooltip(e, id){
+  const c = RAW_CUSTOMERS.find(x=>x.id===id);
+  const tip = document.getElementById('qTooltip');
+  tip.innerHTML = `<b>${c.id}</b><br>${c.segment} · ${c.branch}<br>
+    Score: <span class="mono">${c.score}</span> · Tier: ${c.tier}<br>
+    Liquid balance: <span class="mono">${fmtTHBShort(c.liquidBalance)}</span><br>
+    Opportunity AUM: <span class="mono">${fmtTHBShort(c.opportunityAUM)}</span><br>
+    Trigger: ${c.trigger}`;
+  tip.style.display='block';
+  tip.style.left = (e.clientX+14)+'px';
+  tip.style.top = (e.clientY+10)+'px';
+}
+function hideTooltip(){ document.getElementById('qTooltip').style.display='none'; }
+
+/* ============================================================
+   RENDER: BEHAVIOUR TREND
+============================================================ */
+const seriesCache = {};
+function getSeries(c){
+  if(seriesCache[c.id]) return seriesCache[c.id];
+  const rnd = mulberry32(hashStr(c.id));
+  const n=36;
+  let deposits=[], invest=[], outflow=[];
+  let dep = c.liquidBalance*0.55, inv = c.liquidBalance*(c.investRatio/100), out=0;
+  const depDrift = c.trigger.includes('idle balance') ? 0.012 : 0.002;
+  const outDrift = c.trigger.includes('external transfers') ? 0.05 : 0.008;
+  for(let i=0;i<n;i++){
+    dep = dep*(1+depDrift+(rnd()-0.5)*0.02);
+    inv = inv*(1+0.004+(rnd()-0.5)*0.015);
+    out = Math.max(0, out*(1+outDrift) + rnd()*15000);
+    deposits.push(Math.round(dep));
+    invest.push(Math.round(inv));
+    outflow.push(Math.round(out));
+  }
+  const events=[];
+  if(c.trigger.includes('Term deposit')) events.push({m:n-3, label:'Term deposit maturity'});
+  if(c.trigger.includes('cash inflow')) events.push({m:n-6, label:'Significant cash inflow'});
+  if(c.trigger.includes('external transfers')) events.push({m:n-10, label:'Persistent external transfers'});
+  if(c.trigger.includes('idle balance')) events.push({m:n-4, label:'Rising idle balance'});
+  if(c.trigger.includes('RM engagement')) events.push({m:n-1, label:'Recent RM engagement'});
+  seriesCache[c.id] = {deposits, invest, outflow, events};
+  return seriesCache[c.id];
+}
+const TW=680, TH=230, TPAD={l:52,r:16,t:16,b:30};
+function renderTrend(c){
+  const emptyEl = document.getElementById('trendEmpty');
+  const contentEl = document.getElementById('trendContent');
+  if(!c){
+    document.getElementById('behaviourCustLbl').textContent = '';
+    document.getElementById('trendLegend').innerHTML = '';
+    emptyEl.innerHTML = `<span class="ic">◔</span>Select a customer from the quadrant or table below to view their balance and transfer trend.`;
+    emptyEl.style.display='flex';
+    contentEl.style.display='none';
+    return;
+  }
+  emptyEl.style.display='none';
+  contentEl.style.display='block';
+  document.getElementById('behaviourCustLbl').textContent = '— '+c.name+' ('+c.id+')';
+  const {deposits, invest, outflow, events} = getSeries(c);
+  const period = state.trendPeriod;
+  const slice = arr => arr.slice(arr.length-period);
+  const d=slice(deposits), iv=slice(invest), of=slice(outflow);
+  const all = d.concat(iv).concat(of);
+  const maxV = Math.max(...all, 1);
+  const n=d.length;
+  const xS = i => TPAD.l + (i/(n-1))*(TW-TPAD.l-TPAD.r);
+  const yS = v => TH-TPAD.b - (v/maxV)*(TH-TPAD.t-TPAD.b);
+  const path = arr => arr.map((v,i)=> (i===0?'M':'L')+xS(i).toFixed(1)+','+yS(v).toFixed(1)).join(' ');
+
+  let s = `<rect x="0" y="0" width="${TW}" height="${TH}" fill="#FCFDFC"/>`;
+  s += `<line x1="${TPAD.l}" y1="${TH-TPAD.b}" x2="${TW-TPAD.r}" y2="${TH-TPAD.b}" stroke="#C7D1CA"/>`;
+  s += `<line x1="${TPAD.l}" y1="${TPAD.t}" x2="${TPAD.l}" y2="${TH-TPAD.b}" stroke="#C7D1CA"/>`;
+  s += `<text x="4" y="${TPAD.t+8}" class="quad-label">${fmtTHBShort(maxV)}</text>`;
+  s += `<text x="4" y="${TH-TPAD.b}" class="quad-label">0</text>`;
+  s += `<path d="${path(d)}" fill="none" stroke="#0E7C5A" stroke-width="2"/>`;
+  s += `<path d="${path(iv)}" fill="none" stroke="#2E6E8A" stroke-width="2"/>`;
+  s += `<path d="${path(of)}" fill="none" stroke="#B8720F" stroke-width="2" stroke-dasharray="4,3"/>`;
+
+  const startIdx = 36-period;
+  events.filter(e=>e.m>=startIdx).forEach(e=>{
+    const idx = e.m-startIdx;
+    if(idx<0||idx>=n) return;
+    const x=xS(idx);
+    s += `<line x1="${x}" y1="${TPAD.t}" x2="${x}" y2="${TH-TPAD.b}" stroke="#A23B2E" stroke-width="1" stroke-dasharray="2,3" opacity="0.55"/>`;
+    s += `<circle cx="${x}" cy="${TPAD.t+4}" r="3" fill="#A23B2E"/>`;
+  });
+  document.getElementById('trendSvg').innerHTML = s;
+
+  document.getElementById('trendLegend').innerHTML = `
+    <div class="item"><span class="swatch" style="background:#0E7C5A"></span>Deposits &amp; savings</div>
+    <div class="item"><span class="swatch" style="background:#2E6E8A"></span>Investment balance</div>
+    <div class="item"><span class="swatch" style="background:#B8720F"></span>External outflows</div>
+    <div class="item"><span class="swatch" style="background:#A23B2E;border-radius:50%;width:8px;height:8px;"></span>Trigger event</div>
+  `;
+}
+
+/* ============================================================
+   RENDER: PRODUCT POSITION
+============================================================ */
+function renderProducts(c){
+  const el = document.getElementById('productPanel');
+  if(!c){ el.innerHTML = `<div class="empty-state"><span class="ic">◔</span>Select a customer to view current product position and gaps.</div>`; return; }
+  el.innerHTML = ALL_PRODUCTS.map(p=>{
+    let cls, label;
+    if(c.excluded.includes(p)){ cls='excluded'; label='Excluded'; }
+    else if(c.held.includes(p)){ cls='held'; label='Held'; }
+    else { cls='gap'; label='Opportunity'; }
+    return `<div class="prod-row">
+      <div class="prod-name">${p}</div>
+      <div class="prod-track"><div class="prod-fill ${cls}"></div></div>
+      <div class="prod-status ${cls}">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   RENDER: COHORT COMPARISON
+============================================================ */
+function renderCohort(c){
+  if(!c){
+    document.getElementById('cohortCustLbl').textContent = '';
+    document.getElementById('cohortGrid').innerHTML = `<div class="empty-state" style="grid-column:1 / -1;"><span class="ic">◔</span>Select a customer to compare them against the successful Wealth customer cohort.</div>`;
+    return;
+  }
+  document.getElementById('cohortCustLbl').textContent = '— '+c.name+' ('+c.id+')';
+  const custVals = {
+    investRatio: c.investRatio,
+    liquidBalance: c.liquidBalance,
+    transferIntensity: c.transferIntensity,
+    productPenetration: (c.held.length/ALL_PRODUCTS.length)*100,
+    digitalEngagement: c.digitalEngagement,
+    rmInteractions: c.rmInteractions,
+  };
+  document.getElementById('cohortGrid').innerHTML = Object.keys(COHORT_BENCHMARKS).map(key=>{
+    const b = COHORT_BENCHMARKS[key];
+    const cv = custVals[key];
+    const pct = v => Math.min(100, (v/b.domainMax)*100);
+    return `<div class="bullet-row">
+      <div class="brow-top"><span class="lbl">${b.label}</span><span class="val">${b.fmt(cv)} <span style="color:var(--text-faint);font-weight:500;">vs median ${b.fmt(b.median)}</span></span></div>
+      <div class="btrack">
+        <div class="brange" style="left:${pct(b.min)}%; width:${pct(b.max)-pct(b.min)}%;"></div>
+        <div class="bmedian" style="left:${pct(b.median)}%;"></div>
+        <div class="bdot" style="left:${pct(cv)}%;"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   RENDER: PRIORITY / NEXT BEST ACTION
+============================================================ */
+function reasonsFor(c){
+  const r=[];
+  r.push(`Trigger detected: ${c.trigger}.`);
+  if(c.investRatio < COHORT_BENCHMARKS.investRatio.median) r.push(`Deposit-to-investment ratio (${c.investRatio}%) is below the successful-cohort median (${COHORT_BENCHMARKS.investRatio.median}%), indicating unallocated liquidity.`);
+  if(c.opportunityAUM > 2000000) r.push(`Estimated opportunity AUM of ${fmtTHBShort(c.opportunityAUM)} places this customer in a high-value segment.`);
+  if(c.transferIntensity > COHORT_BENCHMARKS.transferIntensity.median) r.push(`External-transfer intensity is above the cohort median, a possible sign of assets held elsewhere.`);
+  return r;
+}
+function signalsFor(c){
+  const s=[];
+  s.push(`Liquid balance: ${fmtTHBFull(c.liquidBalance)}`);
+  s.push(`Product penetration: ${c.held.length} of ${ALL_PRODUCTS.length} products held`);
+  s.push(`Digital engagement score: ${c.digitalEngagement}/100`);
+  s.push(`RM interactions (12m): ${c.rmInteractions}`);
+  return s;
+}
+function approachFor(c){
+  return c.digitalEngagement>=68
+    ? 'Secure digital message + portfolio link; RM call if no response within 5 business days.'
+    : 'Personal RM call or branch appointment — lower digital engagement history.';
+}
+function productSuggestionFor(c){
+  if(c.trigger.includes('Term deposit')) return 'TD reinvestment: structured deposit or balanced fund on maturity.';
+  if(c.trigger.includes('external transfers')) return 'Portfolio consolidation review — assets likely held externally.';
+  if(c.trigger.includes('cash inflow')) return 'Liquidity allocation discussion for recent inflow.';
+  if(c.trigger.includes('idle balance')) return 'Diversification — entry-level investment product for idle cash.';
+  return 'General relationship review and needs discussion.';
+}
+function confidenceFor(c){ return c.score>=70 ? 'High' : c.score>=45 ? 'Medium' : 'Low'; }
+
+function renderPriorityPanel(c){
+  const el = document.getElementById('priorityPanel');
+  if(!c){
+    el.innerHTML = `<div class="empty-state">
+      <span class="ic">◔</span>
+      <div><b>No customer selected</b><br>Select a customer from the opportunity quadrant or the ranked table below to view their priority score and next best action.</div>
+    </div>`;
+    return;
+  }
+  const ringColor = tierFill(c.tier);
+  el.innerHTML = `
+    <div class="score-block">
+      <div class="score-ring" style="background:${ringColor}">${c.score}</div>
+      <div>
+        <div style="font-weight:700; font-size:13.5px; margin-bottom:4px;">${c.name} <span class="tier-badge tier-${c.tier}">${c.tier} tier</span></div>
+        <div style="font-size:11.5px; color:var(--text-dim);">${c.id} · ${c.segment} · ${c.branch}</div>
+      </div>
+    </div>
+    <div class="kv-line"><span class="k">Estimated opportunity AUM</span><span class="v">${fmtTHBFull(c.opportunityAUM)}</span></div>
+    <div class="kv-line"><span class="k">Recommendation confidence</span><span class="v">${confidenceFor(c)}</span></div>
+
+    <div class="subhead">Recommended action</div>
+    <div class="action-card">
+      <div class="action-row"><span class="ic">◎</span><div class="body"><div class="k">Engagement approach</div><div class="v">${approachFor(c)}</div></div></div>
+      <div class="action-row"><span class="ic">＋</span><div class="body"><div class="k">Product / portfolio discussion</div><div class="v">${productSuggestionFor(c)}</div></div></div>
+    </div>
+
+    <details class="open-qs" style="margin-top:6px;">
+      <summary>Why this customer is prioritised</summary>
+      <div style="margin-top:8px;">
+        <div class="subhead" style="margin-top:0;">Key reasons</div>
+        <ul class="reasons-list">${reasonsFor(c).map(r=>`<li>${r}</li>`).join('')}</ul>
+
+        <div class="subhead">Behavioural signals</div>
+        <ul class="signals-list">${signalsFor(c).map(r=>`<li>${r}</li>`).join('')}</ul>
+
+        <div class="subhead">Existing CRM recommendation</div>
+        <div class="approach-box">${c.existingCRMReco ? c.existingCRMReco : 'None recorded in CRM for this customer.'}</div>
+
+        <div class="subhead">Suitability &amp; regulatory checks</div>
+        <div class="approach-box">${c.excluded.length ? 'Flagged: '+c.excluded.map(p=>p+' excluded pending suitability/eligibility review').join('; ')+'.' : 'No suitability flags on file for this customer.'}${!c.eligible ? '<br><b style="color:var(--restricted)">Contact restricted: '+c.eligibilityReason+'</b>' : ''}</div>
+      </div>
+    </details>
+
+    <div class="callout">
+      <div class="head">⚠ Decision logic to be discussed with SCB</div>
+      <div style="font-size:11.5px; color:var(--text-dim);">This wireframe does not assume AI is the selected approach. Possible approaches:</div>
+      <div class="approach-pills">
+        <span>Business-rule-based prioritisation</span>
+        <span>AI / ML propensity &amp; opportunity models</span>
+        <span>Hybrid: regulatory + business rules + AI/ML</span>
+        <span>Reuse / enhance existing CRM (Salesforce) recommendations</span>
+      </div>
+      <details class="open-qs">
+        <summary>Open discovery questions</summary>
+        <ul>
+          <li>How is an "opportunity customer" defined?</li>
+          <li>What rules determine contact eligibility?</li>
+          <li>What outcome defines successful activation?</li>
+          <li>Which customer and behavioural data is actually available?</li>
+          <li>Should existing product recommendations be reused?</li>
+          <li>What level of explanation and governance is required?</li>
+          <li>How will model or rule performance be monitored?</li>
+        </ul>
+      </details>
+    </div>
+  `;
+}
+
+/* ============================================================
+   RENDER: TABLE
+============================================================ */
+function renderTable(list){
+  const sorted = sortedList(list);
+  document.getElementById('tableCount').textContent = `Showing ${sorted.length} customer${sorted.length!==1?'s':''}`;
+  document.getElementById('custTableBody').innerHTML = sorted.map((c,idx)=>{
+    const selCls = c.id===state.selectedId ? ' selected':'';
+    const restrictedCls = !c.eligible ? ' restricted':'';
+    return `<tr class="${selCls}${restrictedCls}" data-id="${c.id}">
+      <td><span class="rank-pill">${idx+1}</span></td>
+      <td><b>${c.id}</b><br><span style="font-size:10.5px;color:var(--text-faint);font-weight:400;">${c.name}</span></td>
+      <td>${c.segment}</td>
+      <td><span class="elig-${c.eligible?'Eligible':'Restricted'}">${c.eligible?'Eligible':'Restricted'}</span></td>
+      <td class="mono">${c.score}</td>
+      <td class="mono">${fmtTHBShort(c.liquidBalance)}</td>
+      <td class="mono">${fmtTHBShort(c.opportunityAUM)}</td>
+      <td>${c.trigger}</td>
+      <td>${recommendedAction(c)}</td>
+      <td>${rmName(c.rmId)}</td>
+      <td>${lastContactLabel(c.lastContactDays)}</td>
+      <td><span class="status-chip ${statusClass(c.status)}">${c.status}</span></td>
+      <td><button class="rowbtn" data-action="${c.id}" ${!c.eligible?'disabled title="Restricted — not actionable"':''}>Update</button></td>
+    </tr>`;
+  }).join('');
+
+  document.querySelectorAll('#custTableBody tr').forEach(tr=>{
+    tr.addEventListener('click', (e)=>{
+      if(e.target.closest('button')) return;
+      selectCustomer(tr.getAttribute('data-id'));
+    });
+  });
+  document.querySelectorAll('.rowbtn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const id = btn.getAttribute('data-action');
+      selectCustomer(id);
+      openDrawer(id);
+    });
+  });
+}
+document.querySelectorAll('#custTable thead th[data-k]').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const k = th.getAttribute('data-k');
+    if(state.sortKey===k){ state.sortDir = state.sortDir==='asc'?'desc':'asc'; }
+    else { state.sortKey=k; state.sortDir='desc'; }
+    document.querySelectorAll('#custTable thead th').forEach(x=>x.classList.remove('sorted','sorted-asc'));
+    th.classList.add(state.sortDir==='desc' ? 'sorted' : 'sorted-asc');
+    renderAll();
+  });
+});
+
+/* ============================================================
+   RENDER: FUNNEL
+============================================================ */
+function renderFunnel(list){
+  const eligibleList = list.filter(c=>c.eligible);
+  document.getElementById('funnelScopeLbl').textContent = state.role==='rm' ? '— selected RM(s) book' : '— full portfolio (filtered)';
+  const counts = FUNNEL_STAGES.map(stage=>{
+    const rank = STATUS_RANK[stage];
+    return eligibleList.filter(c=> STATUS_RANK[c.status] >= rank).length;
+  });
+  const base = counts[0]||1;
+  document.getElementById('funnelRow').innerHTML = FUNNEL_STAGES.map((stage,i)=>{
+    const rate = base ? Math.round(counts[i]/base*100) : 0;
+    return `<div class="fstage"><div class="n">${counts[i]}</div><div class="l">${stage}</div><div class="r">${rate}%</div></div>`;
+  }).join('');
+
+  const invested = eligibleList.filter(c=>c.status==='Invested');
+  const newMoney = invested.reduce((s,c)=>s+c.opportunityAUM*0.6,0);
+  const baseline = newMoney*0.62; // illustrative baseline comparison
+  document.getElementById('funnelMeta').innerHTML = `
+    <div class="fmeta-item"><b>${fmtTHBShort(newMoney)}</b>New money generated (illustrative)</div>
+    <div class="fmeta-item"><b>${fmtTHBShort(baseline)}</b>Baseline comparison (untargeted outreach, illustrative)</div>
+    <div class="fmeta-item"><b>${counts[0]?Math.round(counts[5]/counts[0]*100):0}%</b>End-to-end conversion (Identified → Invested)</div>
+  `;
+
+  const rmPerfEl = document.getElementById('rmPerf');
+  if(state.role==='leadership'){
+    rmPerfEl.style.display='block';
+    document.getElementById('rmPerfBody').innerHTML = RMS.map(rm=>{
+      const own = RAW_CUSTOMERS.filter(c=>c.rmId===rm.id && c.eligible);
+      const assigned = own.filter(c=>STATUS_RANK[c.status]>=1).length;
+      const contacted = own.filter(c=>STATUS_RANK[c.status]>=2).length;
+      const invested = own.filter(c=>c.status==='Invested').length;
+      const conv = assigned ? Math.round(invested/assigned*100) : 0;
+      return `<tr><td>${rm.name}</td><td>${assigned}</td><td>${contacted}</td><td>${invested}</td>
+        <td><div class="barcell"><i style="width:${conv}%"></i></div> <span class="mono" style="font-size:10.5px;">${conv}%</span></td></tr>`;
+    }).join('');
+  } else {
+    rmPerfEl.style.display='none';
+  }
+}
+
+/* ============================================================
+   SELECT / RENDER ALL
+============================================================ */
+function selectCustomer(id){
+  state.selectedId = id;
+  renderAll();
+}
+function currentCustomer(){
+  return state.selectedId ? RAW_CUSTOMERS.find(c=>c.id===state.selectedId) : null;
+}
+function renderAll(){
+  const gateActive = state.role==='rm' && state.selectedRMs.length===0;
+  document.getElementById('rmGatePrompt').style.display = gateActive ? 'block' : 'none';
+  document.getElementById('mainContentArea').style.display = gateActive ? 'none' : 'block';
+  if(gateActive) return;
+
+  const list = filteredCustomers();
+  if(state.selectedId && !list.find(c=>c.id===state.selectedId)){
+    state.selectedId = null;
+  }
+  // If filters (e.g. the Customer ID / Name dropdowns) narrow the list to exactly
+  // one customer, treat that as an implicit selection so detail panels populate
+  // without requiring an extra click on the row.
+  if(!state.selectedId && list.length===1){
+    state.selectedId = list[0].id;
+  }
+  const c = currentCustomer();
+
+  const safe = (fn, label, ...args) => {
+    try{ fn(...args); }
+    catch(err){ console.error('[render error]', label, err); }
+  };
+  safe(renderKPIs, 'renderKPIs', list);
+  safe(renderQuadrant, 'renderQuadrant', list);
+  safe(renderTable, 'renderTable', list);
+  safe(renderFunnel, 'renderFunnel', list);
+  safe(renderTrend, 'renderTrend', c);
+  safe(renderProducts, 'renderProducts', c);
+  safe(renderCohort, 'renderCohort', c);
+  safe(renderPriorityPanel, 'renderPriorityPanel', c);
+}
+
+/* ============================================================
+   FILTER BAR WIRING
+============================================================ */
+document.getElementById('fBranch').addEventListener('change', e=>{ state.filters.branch=e.target.value; renderAll(); });
+document.getElementById('fSegment').addEventListener('change', e=>{ state.filters.segment=e.target.value; renderAll(); });
+document.getElementById('fRM').addEventListener('change', e=>{ state.filters.rm=e.target.value; renderAll(); });
+document.getElementById('fEligibility').addEventListener('change', e=>{ state.filters.eligibility=e.target.value; renderAll(); });
+document.getElementById('fTier').addEventListener('change', e=>{ state.filters.tier=e.target.value; renderAll(); });
+document.getElementById('fInvest').addEventListener('change', e=>{ state.filters.invest=e.target.value; renderAll(); });
+document.getElementById('fLastContact').addEventListener('change', e=>{ state.filters.lastContact=e.target.value; renderAll(); });
+document.getElementById('fStatus').addEventListener('change', e=>{ state.filters.status=e.target.value; renderAll(); });
+
+/* ============================================================
+   CUSTOMER ID / NAME MULTI-SELECT DROPDOWNS
+============================================================ */
+function updateMselLabel(kind){
+  const btn = document.getElementById(kind==='id' ? 'mselIdBtn' : 'mselNameBtn');
+  const arr = kind==='id' ? state.filters.customerIds : state.filters.customerNames;
+  const fallback = kind==='id' ? 'All IDs' : 'All names';
+  btn.textContent = arr.length===0 ? fallback : arr.length + ' selected';
+}
+function buildMultiSelect(kind){
+  const panel = document.getElementById(kind==='id' ? 'mselIdPanel' : 'mselNamePanel');
+  const source = scopedCustomers();
+  const opts = kind==='id'
+    ? source.map(c=>({v:c.id, l:c.id}))
+    : source.map(c=>({v:c.name, l:c.name + ' · ' + c.id}));
+  const activeArr = kind==='id' ? state.filters.customerIds : state.filters.customerNames;
+
+  panel.innerHTML = opts.map(o=>`<label class="msel-opt"><input type="checkbox" value="${o.v}" ${activeArr.includes(o.v)?'checked':''}> ${o.l}</label>`).join('')
+    + `<div class="msel-actions"><button type="button" class="msel-clear">Clear selection</button></div>`;
+
+  panel.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const arr = kind==='id' ? state.filters.customerIds : state.filters.customerNames;
+      if(cb.checked){ arr.push(cb.value); } else { const i=arr.indexOf(cb.value); if(i>-1) arr.splice(i,1); }
+      updateMselLabel(kind);
+      renderAll();
+    });
+  });
+  panel.querySelector('.msel-clear').addEventListener('click', ()=>{
+    panel.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+    (kind==='id' ? state.filters.customerIds : state.filters.customerNames).length = 0;
+    updateMselLabel(kind);
+    renderAll();
+  });
+  updateMselLabel(kind);
+}
+document.querySelectorAll('.msel-panel').forEach(p=> p.addEventListener('click', e=>e.stopPropagation()) );
+document.querySelectorAll('.msel-btn').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const panel = btn.nextElementSibling;
+    const wasOpen = panel.classList.contains('open');
+    document.querySelectorAll('.msel-panel').forEach(p=>p.classList.remove('open'));
+    if(!wasOpen) panel.classList.add('open');
+  });
+});
+document.addEventListener('click', ()=>{ document.querySelectorAll('.msel-panel').forEach(p=>p.classList.remove('open')); });
+buildMultiSelect('id');
+buildMultiSelect('name');
+
+/* ============================================================
+   RM MULTI-SELECT (mandatory in Individual RM view)
+============================================================ */
+function updateRMLabel(){
+  const btn = document.getElementById('mselRMBtn');
+  const n = state.selectedRMs.length;
+  btn.textContent = n===0 ? 'Select RM(s)' : n + ' RM' + (n>1?'s':'') + ' selected';
+}
+function buildRMMultiSelect(){
+  const panel = document.getElementById('mselRMPanel');
+  panel.innerHTML = RMS.map(r=>`<label class="msel-opt"><input type="checkbox" value="${r.id}" ${state.selectedRMs.includes(r.id)?'checked':''}> ${r.name} <span style="color:var(--text-faint);">· ${r.branch}</span></label>`).join('')
+    + `<div class="msel-actions"><button type="button" class="msel-clear">Clear selection</button></div>`;
+  panel.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      if(cb.checked){ state.selectedRMs.push(cb.value); }
+      else { const i=state.selectedRMs.indexOf(cb.value); if(i>-1) state.selectedRMs.splice(i,1); }
+      updateRMLabel();
+      renderAll();
+    });
+  });
+  panel.querySelector('.msel-clear').addEventListener('click', ()=>{
+    panel.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+    state.selectedRMs.length = 0;
+    updateRMLabel();
+    renderAll();
+  });
+  updateRMLabel();
+}
+buildRMMultiSelect();
+
+/* ============================================================
+   PERIOD TABS
+============================================================ */
+document.getElementById('periodTabs').addEventListener('click', e=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  state.trendPeriod = parseInt(btn.getAttribute('data-p'),10);
+  document.querySelectorAll('#periodTabs button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTrend(currentCustomer());
+});
+
+/* ============================================================
+   ROLE TOGGLE
+============================================================ */
+document.getElementById('roleToggle').addEventListener('click', e=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  state.role = btn.getAttribute('data-role');
+  document.querySelectorAll('#roleToggle button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('grpBranch').style.display = state.role==='rm' ? 'none':'flex';
+  document.getElementById('grpRM').style.display = state.role==='rm' ? 'none':'flex';
+  document.getElementById('grpRMPicker').style.display = state.role==='rm' ? 'flex':'none';
+  state.filters.customerIds = [];
+  state.filters.customerNames = [];
+  buildMultiSelect('id');
+  buildMultiSelect('name');
+  buildRMMultiSelect();
+  renderAll();
+});
+
+/* ============================================================
+   DRAWER (RM action / CRM write-back)
+============================================================ */
+let drawerCustomerId = null;
+let drawerAssignChoice = null;
+let drawerAcceptChoice = null;
+
+function openDrawer(id){
+  drawerCustomerId = id;
+  drawerAssignChoice = null;
+  drawerAcceptChoice = null;
+  const c = RAW_CUSTOMERS.find(x=>x.id===id);
+  document.getElementById('drawerMeta').textContent = `${c.name} · ${c.id} · ${c.segment} · ${c.branch}`;
+
+  const showAcceptDecline = state.role==='rm' && c.status==='Assigned';
+  const showAssign = state.role==='leadership';
+
+  document.getElementById('drawerBody').innerHTML = `
+    ${showAssign ? `
+    <div class="field">
+      <label>Assign / reassign RM</label>
+      <select id="dAssignRM">
+        <option value="">— keep current (${rmName(c.rmId)}) —</option>
+        ${RMS.map(r=>`<option value="${r.id}">${r.name} · ${r.branch}</option>`).join('')}
+      </select>
+    </div>` : ''}
+
+    ${showAcceptDecline ? `
+    <div class="field">
+      <label>Accept or decline this assignment</label>
+      <div class="accept-decline">
+        <button type="button" id="dAccept" class="accept">Accept</button>
+        <button type="button" id="dDecline" class="decline">Decline</button>
+      </div>
+    </div>
+    <div class="field" id="dDeclineReasonWrap" style="display:none;">
+      <label>Decline reason</label>
+      <input type="text" id="dDeclineReason" placeholder="e.g. Outside coverage area, relationship conflict…">
+    </div>` : ''}
+
+    <div class="field">
+      <label>Contact outcome</label>
+      <select id="dOutcome">
+        <option>No answer</option><option>Call completed</option><option>Meeting booked</option>
+        <option>Meeting completed</option><option>Declined to engage</option>
+      </select>
+    </div>
+    <div class="field"><label>Meeting date</label><input type="date" id="dMeetingDate"></div>
+    <div class="field"><label>Meeting notes</label><textarea id="dNotes" placeholder="Summary of discussion…"></textarea></div>
+    <div class="field"><label>Customer interests</label><input type="text" id="dInterests" placeholder="e.g. Balanced fund, term deposit alternatives"></div>
+    <div class="field"><label>Customer objections</label><input type="text" id="dObjections" placeholder="e.g. Prefers liquidity, wants to review with spouse"></div>
+    <div class="field"><label>Product discussed</label>
+      <select id="dProduct"><option value="">— none —</option>${ALL_PRODUCTS.map(p=>`<option>${p}</option>`).join('')}</select>
+    </div>
+    <div class="field"><label>Next action</label>
+      <select id="dNextAction"><option>Schedule follow-up call</option><option>Send proposal</option><option>Await customer decision</option><option>No further action</option></select>
+    </div>
+    <div class="field"><label>Follow-up date</label><input type="date" id="dFollowUp"></div>
+    <div class="field"><label>Final outcome / status</label>
+      <select id="dFinalStatus">${STATUSES.map(s=>`<option ${s===c.status?'selected':''}>${s}</option>`).join('')}</select>
+    </div>
+    <div class="crm-note">CRM (Salesforce) remains the system of record. This action will be synced back; it does not connect to a live backend in this wireframe.</div>
+  `;
+
+  if(showAcceptDecline){
+    document.getElementById('dAccept').addEventListener('click', ()=>{
+      drawerAcceptChoice='accept';
+      document.getElementById('dAccept').classList.add('chosen-accept');
+      document.getElementById('dDecline').classList.remove('chosen-decline');
+      document.getElementById('dDeclineReasonWrap').style.display='none';
+    });
+    document.getElementById('dDecline').addEventListener('click', ()=>{
+      drawerAcceptChoice='decline';
+      document.getElementById('dDecline').classList.add('chosen-decline');
+      document.getElementById('dAccept').classList.remove('chosen-accept');
+      document.getElementById('dDeclineReasonWrap').style.display='flex';
+    });
+  }
+
+  document.getElementById('drawerSyncStatus').textContent='Not yet synced';
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('drawer').classList.add('show');
+}
+function closeDrawer(){
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('drawer').classList.remove('show');
+}
+document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+document.getElementById('overlay').addEventListener('click', closeDrawer);
+
+document.getElementById('drawerSave').addEventListener('click', ()=>{
+  const c = RAW_CUSTOMERS.find(x=>x.id===drawerCustomerId);
+  if(!c) return;
+
+  const finalSel = document.getElementById('dFinalStatus');
+  let newStatus = finalSel ? finalSel.value : c.status;
+
+  const assignSel = document.getElementById('dAssignRM');
+  if(assignSel && assignSel.value){
+    c.rmId = assignSel.value;
+    if(newStatus==='Identified') newStatus='Assigned';
+  }
+
+  if(drawerAcceptChoice==='accept'){ newStatus='Accepted'; }
+  if(drawerAcceptChoice==='decline'){
+    newStatus='Identified';
+    c.rmId=null;
+    c.declineReason = (document.getElementById('dDeclineReason')||{}).value || 'Not specified';
+  }
+
+  c.status = newStatus;
+  c.lastContactDays = 0;
+
+  document.getElementById('drawerSyncStatus').textContent='Syncing to CRM…';
+  document.getElementById('drawerSave').disabled = true;
+  setTimeout(()=>{
+    const t = new Date();
+    const hh = String(t.getHours()).padStart(2,'0'), mm=String(t.getMinutes()).padStart(2,'0');
+    document.getElementById('drawerSyncStatus').textContent = `Synced ✓ ${hh}:${mm}`;
+    document.getElementById('syncText').textContent = `CRM synced · ${hh}:${mm}`;
+    document.getElementById('drawerSave').disabled = false;
+    showToast(`${c.id} updated and synced to CRM`);
+    renderAll();
+    setTimeout(closeDrawer, 650);
+  }, 900);
+});
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toastText').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+renderAll();
+})();
+</script>
+
+    </div>
+  </div>
+
+</div>
+<script>
+/* ---------- Nav ---------- */
+function showSection(id){
+  document.querySelectorAll('.page-section').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('section-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  document.getElementById('nav-' + id).classList.add('active');
+}
+function toggleSidebar(){
+  var sb = document.getElementById('app-sidebar');
+  sb.classList.toggle('collapsed');
+  document.getElementById('sidebar-toggle-btn').innerHTML = sb.classList.contains('collapsed') ? '&#10095;' : '&#10094;';
+}
+function toggleNavGroup(){
+  document.getElementById('nav-children-campaign').classList.toggle('collapsed');
+  document.getElementById('nav-chev-campaign').classList.toggle('collapsed-icon');
+}
+
+/* ---------- Chart bar selection (Qlik-style) ---------- */
+function selectBar(el){
+  var chart = el.getAttribute('data-chart');
+  var label = el.getAttribute('data-label');
+  var bars = document.querySelectorAll('rect[data-chart="' + chart + '"]');
+  var chip = document.getElementById('chip-' + chart);
+  var already = el.classList.contains('bar-selected');
+  bars.forEach(function(b){ b.classList.remove('bar-selected', 'bar-dim'); });
+  if (already) { chip.style.display = 'none'; }
+  else {
+    bars.forEach(function(b){ if (b === el) b.classList.add('bar-selected'); else b.classList.add('bar-dim'); });
+    chip.innerHTML = 'Selected: ' + label + ' &nbsp;&times;';
+    chip.style.display = 'inline-flex';
+  }
+}
+function clearChart(chart){
+  document.querySelectorAll('rect[data-chart="' + chart + '"]').forEach(function(b){ b.classList.remove('bar-selected', 'bar-dim'); });
+  var chip = document.getElementById('chip-' + chart);
+  if (chip) chip.style.display = 'none';
+}
+function forceSelectBar(chart, label){
+  var bars = document.querySelectorAll('rect[data-chart="' + chart + '"]');
+  var chip = document.getElementById('chip-' + chart);
+  var found = false;
+  bars.forEach(function(b){
+    if (b.getAttribute('data-label') === label) { b.classList.add('bar-selected'); b.classList.remove('bar-dim'); found = true; }
+    else { b.classList.add('bar-dim'); b.classList.remove('bar-selected'); }
+  });
+  if (found && chip) { chip.innerHTML = 'Selected: ' + label + ' &nbsp;&times;'; chip.style.display = 'inline-flex'; }
+}
+
+/* ---------- Shared filter bar ---------- */
+function filterBarHTML(prefix){
+  return '<div class="filter-bar">' +
+    '<div class="filter-field"><label>Channel</label><select id="' + prefix + '-channel" onchange="onFilterChange(\'' + prefix + '\')"><option>All</option><option>Push</option><option>Email</option><option>In-app</option></select></div>' +
+    '<div class="filter-field"><label>Segment</label><select id="' + prefix + '-segment" onchange="onFilterChange(\'' + prefix + '\')"><option>All</option><option>Mass</option><option>Affluent</option><option>Prime</option><option>Private</option></select></div>' +
+    '<div class="filter-field"><label>Creative</label><select id="' + prefix + '-creative" onchange="onFilterChange(\'' + prefix + '\')"><option>All</option><option>A</option><option>B</option><option>C</option></select></div>' +
+    '<div class="filter-field"><label>Date range</label><select id="' + prefix + '-daterange" onchange="onFilterChange(\'' + prefix + '\')"><option>Last 30 days</option><option>Last 7 days</option><option>Last 90 days</option></select></div>' +
+    '<div class="filter-field grow"><label>Customer name</label><input type="text" id="' + prefix + '-customer" list="customer-options" placeholder="Search or select a customer" oninput="onFilterChange(\'' + prefix + '\')"></div>' +
+    '<button class="filter-clear" onclick="clearFilters(\'' + prefix + '\')">Clear filters</button>' +
+  '</div>' +
+  '<div class="showing-chip" id="' + prefix + '-showing"></div>';
+}
+function updateShowingChip(prefix){
+  var parts = [];
+  var chan = document.getElementById(prefix + '-channel').value;
+  var seg = document.getElementById(prefix + '-segment').value;
+  var cre = document.getElementById(prefix + '-creative').value;
+  var dr = document.getElementById(prefix + '-daterange').value;
+  var cust = document.getElementById(prefix + '-customer').value;
+  if (chan !== 'All') parts.push('Channel: ' + chan);
+  if (seg !== 'All') parts.push('Segment: ' + seg);
+  if (cre !== 'All') parts.push('Creative: ' + cre);
+  parts.push(dr);
+  if (cust) parts.push('Customer: ' + cust);
+  document.getElementById(prefix + '-showing').textContent = 'Showing: ' + parts.join(' \u00b7 ');
+}
+function clearFilters(prefix){
+  document.getElementById(prefix + '-channel').value = 'All';
+  document.getElementById(prefix + '-segment').value = 'All';
+  document.getElementById(prefix + '-creative').value = 'All';
+  document.getElementById(prefix + '-daterange').value = 'Last 30 days';
+  document.getElementById(prefix + '-customer').value = '';
+  onFilterChange(prefix);
+}
+function onFilterChange(prefix){
+  updateShowingChip(prefix);
+  if (prefix === 'ov') applyOverviewFilters();
+  if (prefix === 'rc') applyRootCauseFilters();
+}
+
+/* ---------- Overview: filter-driven KPI + chart highlight ---------- */
+var SEGMENT_KPI = {
+  All: { ctr: 3.4, campaigns: 4.6, conv: 0.9, suppressed: 38 },
+  Mass: { ctr: 5.9, campaigns: 3.1, conv: 1.3, suppressed: 12 },
+  Affluent: { ctr: 4.7, campaigns: 3.8, conv: 1.0, suppressed: 22 },
+  Prime: { ctr: 2.8, campaigns: 7.2, conv: 0.4, suppressed: 61 },
+  Private: { ctr: 3.5, campaigns: 4.0, conv: 0.8, suppressed: 29 }
+};
+var CHANNEL_KPI = {
+  All: SEGMENT_KPI.All,
+  Push: { ctr: 2.1, campaigns: 5.5, conv: 0.5, suppressed: 47 },
+  Email: { ctr: 4.8, campaigns: 3.9, conv: 1.0, suppressed: 24 },
+  'In-app': { ctr: 6.3, campaigns: 3.2, conv: 1.5, suppressed: 9 }
+};
+function applyOverviewFilters(){
+  var seg = document.getElementById('ov-segment').value;
+  var chan = document.getElementById('ov-channel').value;
+  var data, dim, val;
+  if (chan !== 'All') { data = CHANNEL_KPI[chan]; dim = 'channel'; val = chan; }
+  else if (seg !== 'All') { data = SEGMENT_KPI[seg]; dim = 'segment'; val = seg; }
+  else { data = SEGMENT_KPI.All; dim = null; }
+  document.getElementById('kpi-ctr').textContent = data.ctr.toFixed(1) + '%';
+  document.getElementById('kpi-campaigns').textContent = data.campaigns.toFixed(1);
+  document.getElementById('kpi-conv').textContent = data.conv.toFixed(1) + '%';
+  document.getElementById('kpi-suppressed').textContent = data.suppressed + '%';
+  clearChart('segment'); clearChart('channel');
+  if (dim === 'segment') forceSelectBar('segment', val);
+  if (dim === 'channel') forceSelectBar('channel', val);
+}
+
+/* ---------- Explore: self-service builder ---------- */
+var DIM_DATA = {
+  'Channel': { categories: ['Push','Email','In-app'],
+    'CTR':[2.1,4.8,6.3], 'Conversion rate':[0.5,1.0,1.5], 'Avg frequency':[5.5,3.9,3.2],
+    'Clicks':[10500,18200,21300], 'Suppressed reach %':[47,24,9] },
+  'Segment': { categories: ['Mass','Affluent','Prime','Private'],
+    'CTR':[5.9,4.7,2.8,3.5], 'Conversion rate':[1.3,1.0,0.4,0.8], 'Avg frequency':[3.1,3.8,7.2,4.0],
+    'Clicks':[15600,13800,8200,10400], 'Suppressed reach %':[12,22,61,29] },
+  'Frequency bucket': { categories: ['1-2','3-4','5-6','7+'],
+    'CTR':[6.5,4.9,3.1,1.4], 'Conversion rate':[1.6,1.1,0.6,0.2], 'Avg frequency':[1.5,3.5,5.5,8.0],
+    'Clicks':[9000,11200,7300,4500], 'Suppressed reach %':[5,18,42,74] },
+  'Creative': { categories: ['A','B','C'],
+    'CTR':[3.8,3.1,3.6], 'Conversion rate':[0.9,0.7,0.85], 'Avg frequency':[4.6,4.6,4.6],
+    'Clicks':[16800,15200,16000], 'Suppressed reach %':[30,33,31] }
+};
+var BASELINE = { 'CTR':3.4, 'Conversion rate':0.9, 'Avg frequency':4.6, 'Clicks':16667, 'Suppressed reach %':38 };
+var CHART_COLORS = ['#4a2f8f','#c9832e','#2f7a8f','#c0392b','#6a4aa8'];
+
+function togglePill(el){ el.classList.toggle('selected'); }
+function selectChartType(el){
+  document.querySelectorAll('#builder-chart-types .chart-type-tile').forEach(function(t){ t.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+function fmtMeasure(measure, val){
+  if (measure === 'Clicks') return Math.round(val).toLocaleString();
+  if (measure === 'Avg frequency') return val.toFixed(1);
+  return val.toFixed(1) + '%';
+}
+function factorOf(dim, cat, measure){
+  var idx = DIM_DATA[dim].categories.indexOf(cat);
+  return DIM_DATA[dim][measure][idx] / BASELINE[measure];
+}
+function combinedValue(dims, cats, measure){
+  var val = BASELINE[measure];
+  dims.forEach(function(dim, i){ val *= factorOf(dim, cats[i], measure); });
+  return val;
+}
+function polarPoint(cx, cy, r, angleDeg){
+  var rad = (angleDeg - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function selectSingle(el, groupId){
+  document.querySelectorAll('#' + groupId + ' .pill-toggle').forEach(function(b){ b.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function barHTML(categories, seriesList, horizontal){
+  var w = 560, h = 240;
+  var padL = horizontal ? 118 : 40, padB = horizontal ? 16 : 34, padT = 14, padR = 24;
+  var chartW = w - padL - padR, chartH = h - padT - padB;
+  var maxVal = 0; seriesList.forEach(function(s){ s.values.forEach(function(v){ if (v > maxVal) maxVal = v; }); });
+  var n = categories.length, m = seriesList.length;
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%">';
+  if (!horizontal) {
+    var slot = chartW / n, groupW = slot * 0.7, barW = groupW / m;
+    svg += '<line x1="' + padL + '" y1="' + (h - padB) + '" x2="' + (w - padR) + '" y2="' + (h - padB) + '" stroke="#e6e2f2"/>';
+    categories.forEach(function(cat, ci){
+      var gx = padL + ci * slot + (slot - groupW) / 2;
+      seriesList.forEach(function(s, si){
+        var val = s.values[ci], bh = (val / maxVal) * chartH, x = gx + si * barW, y = (h - padB) - bh;
+        svg += '<rect x="' + x + '" y="' + y + '" width="' + (barW * 0.85) + '" height="' + bh + '" rx="3" fill="' + CHART_COLORS[si % CHART_COLORS.length] + '"/>';
+      });
+      svg += '<text x="' + (gx + groupW/2) + '" y="' + (h - padB + 16) + '" text-anchor="middle" font-size="10.5" fill="#6b6486">' + cat + '</text>';
+    });
+  } else {
+    var slotY = chartH / n, groupH = slotY * 0.7, barH = groupH / m;
+    svg += '<line x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (h - padB) + '" stroke="#e6e2f2"/>';
+    categories.forEach(function(cat, ci){
+      var gy = padT + ci * slotY + (slotY - groupH) / 2;
+      seriesList.forEach(function(s, si){
+        var val = s.values[ci], bw = (val / maxVal) * chartW, y = gy + si * barH;
+        svg += '<rect x="' + padL + '" y="' + y + '" width="' + bw + '" height="' + (barH * 0.85) + '" rx="3" fill="' + CHART_COLORS[si % CHART_COLORS.length] + '"/>';
+        svg += '<text x="' + (padL + bw + 6) + '" y="' + (y + barH * 0.6) + '" font-size="10" font-weight="700" fill="#241a3d">' + fmtMeasure(s.name, val) + '</text>';
+      });
+      svg += '<text x="' + (padL - 8) + '" y="' + (gy + groupH/2 + 4) + '" text-anchor="end" font-size="10.5" fill="#6b6486">' + cat + '</text>';
+    });
+  }
+  svg += '</svg>';
+  var legend = m > 1 ? '<div class="chart-legend">' + seriesList.map(function(s, i){ return '<span class="legend-item"><span class="legend-dot" style="background:' + CHART_COLORS[i % CHART_COLORS.length] + '"></span>' + s.name + '</span>'; }).join('') + '</div>' : '';
+  return svg + legend;
+}
+
+function lineHTML(categories, seriesList){
+  var w = 560, h = 220, padL = 40, padB = 30, padT = 16, padR = 24;
+  var chartW = w - padL - padR, chartH = h - padT - padB;
+  var maxVal = 0; seriesList.forEach(function(s){ s.values.forEach(function(v){ if (v > maxVal) maxVal = v; }); });
+  var n = categories.length, slot = n > 1 ? chartW / (n - 1) : 0;
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%">';
+  svg += '<line x1="' + padL + '" y1="' + (h - padB) + '" x2="' + (w - padR) + '" y2="' + (h - padB) + '" stroke="#e6e2f2"/>';
+  seriesList.forEach(function(s, si){
+    var pts = categories.map(function(c, ci){ var x = padL + ci * slot; var y = (h - padB) - (s.values[ci] / maxVal) * chartH; return x + ',' + y; });
+    svg += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + CHART_COLORS[si % CHART_COLORS.length] + '" stroke-width="2.5"/>';
+    categories.forEach(function(c, ci){ var x = padL + ci * slot; var y = (h - padB) - (s.values[ci] / maxVal) * chartH; svg += '<circle cx="' + x + '" cy="' + y + '" r="3.5" fill="' + CHART_COLORS[si % CHART_COLORS.length] + '"/>'; });
+  });
+  categories.forEach(function(c, ci){ var x = padL + ci * slot; svg += '<text x="' + x + '" y="' + (h - padB + 16) + '" text-anchor="middle" font-size="10.5" fill="#6b6486">' + c + '</text>'; });
+  svg += '</svg>';
+  var legend = seriesList.length > 1 ? '<div class="chart-legend">' + seriesList.map(function(s, i){ return '<span class="legend-item"><span class="legend-dot" style="background:' + CHART_COLORS[i % CHART_COLORS.length] + '"></span>' + s.name + '</span>'; }).join('') + '</div>' : '';
+  return svg + legend;
+}
+
+function pieHTML(categories, values, measureName, donut){
+  var w = 280, h = 220, cx = 110, cy = 108, r = 85;
+  var total = values.reduce(function(a, b){ return a + b; }, 0);
+  var startAngle = 0;
+  var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%">';
+  categories.forEach(function(cat, i){
+    var slice = values[i] / total * 360, endAngle = startAngle + slice;
+    var p1 = polarPoint(cx, cy, r, startAngle), p2 = polarPoint(cx, cy, r, endAngle);
+    var largeArc = slice > 180 ? 1 : 0;
+    svg += '<path d="M' + cx + ' ' + cy + ' L' + p1.x + ' ' + p1.y + ' A' + r + ' ' + r + ' 0 ' + largeArc + ' 1 ' + p2.x + ' ' + p2.y + ' Z" fill="' + CHART_COLORS[i % CHART_COLORS.length] + '"/>';
+    startAngle = endAngle;
+  });
+  if (donut) svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.55) + '" fill="#fff"/>';
+  svg += '</svg>';
+  var legend = '<div class="chart-legend">' + categories.map(function(c, i){ return '<span class="legend-item"><span class="legend-dot" style="background:' + CHART_COLORS[i % CHART_COLORS.length] + '"></span>' + c + ': ' + fmtMeasure(measureName, values[i]) + '</span>'; }).join('') + '</div>';
+  return svg + legend;
+}
+
+function getReportData(dims, measures){
+  if (dims.length === 1) {
+    var dim = dims[0], cats = DIM_DATA[dim].categories;
+    var header = [dim].concat(measures);
+    var rows = cats.map(function(cat, i){ return [cat].concat(measures.map(function(m){ return DIM_DATA[dim][m][i]; })); });
+    return { header: header, rows: rows, note: '' };
+  }
+  var d1 = dims[0], d2 = dims[1];
+  var cats1 = DIM_DATA[d1].categories, cats2 = DIM_DATA[d2].categories;
+  var header = [d1, d2].concat(measures);
+  var rows = [];
+  cats1.forEach(function(c1){
+    cats2.forEach(function(c2){
+      rows.push([c1, c2].concat(measures.map(function(m){ return combinedValue([d1, d2], [c1, c2], m); })));
+    });
+  });
+  return { header: header, rows: rows, note: 'Combined dimensions are modeled assuming independence between them, for illustration only.' };
+}
+
+function tableHTML(data){
+  var note = data.note ? '<div class="sample-note" style="margin:0 0 12px;">' + data.note + '</div>' : '';
+  var head = '<tr>' + data.header.map(function(h){ return '<th>' + h + '</th>'; }).join('') + '</tr>';
+  var body = data.rows.map(function(r){
+    return '<tr>' + r.map(function(v, i){
+      if (typeof v === 'number') return '<td>' + fmtMeasure(data.header[i], v) + '</td>';
+      return '<td>' + v + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+  return note + '<table class="data-table"><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
+}
+
+function exportCSV(){
+  if (!window.lastReportData) return;
+  var d = window.lastReportData;
+  var lines = [d.header.join(',')];
+  d.rows.forEach(function(r){
+    lines.push(r.map(function(v){ return typeof v === 'number' ? v.toFixed(2) : v; }).join(','));
+  });
+  var blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'campaign_report.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function renderBuilderChart(){
+  var selDims = Array.from(document.querySelectorAll('#builder-dims .pill-toggle.selected')).map(function(b){ return b.dataset.value; });
+  var selMeasures = Array.from(document.querySelectorAll('#builder-measures .pill-toggle.selected')).map(function(b){ return b.dataset.value; });
+  var chartType = document.querySelector('#builder-chart-types .chart-type-tile.selected').dataset.type;
+  var periodEl = document.querySelector('#builder-period .pill-toggle.selected');
+  var comparisonEl = document.querySelector('#builder-comparison .pill-toggle.selected');
+  var period = periodEl ? periodEl.dataset.value : 'Last 30 days';
+  var comparison = comparisonEl ? comparisonEl.dataset.value : 'None';
+  var container = document.getElementById('builder-chart-container');
+  var outputCol = document.getElementById('builder-output-col');
+
+  if (selDims.length === 0 || selMeasures.length === 0) {
+    outputCol.style.justifyContent = 'center';
+    container.innerHTML = '<div class="builder-empty"><div class="builder-empty-icon">&#128202;</div><div class="builder-empty-title">Configure your report above</div><div class="builder-empty-sub">Select at least one dimension and one measure, then Generate Report</div></div>';
+    return;
+  }
+  outputCol.style.justifyContent = 'flex-start';
+
+  var dimsForData = selDims.slice(0, 2);
+  window.lastReportData = getReportData(dimsForData, selMeasures);
+
+  var vizHtml;
+  if (chartType === 'Table' || selDims.length > 1) {
+    vizHtml = tableHTML(window.lastReportData);
+  } else {
+    var dim = selDims[0], categories = DIM_DATA[dim].categories;
+    if (chartType === 'Pie' || chartType === 'Donut') {
+      vizHtml = pieHTML(categories, DIM_DATA[dim][selMeasures[0]], selMeasures[0], chartType === 'Donut');
+    } else {
+      var seriesList = selMeasures.map(function(m){ return { name: m, values: DIM_DATA[dim][m] }; });
+      vizHtml = (chartType === 'Line') ? lineHTML(categories, seriesList) : barHTML(categories, seriesList, chartType === 'H-Bar');
+    }
+  }
+
+  var title = selMeasures.join(' & ') + ' by ' + selDims.join(', ');
+  var now = new Date();
+  var timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  var meta = period + ' &middot; Generated ' + timeStr;
+
+  var compareNote = '';
+  if (comparison === 'WoW Growth') compareNote = '<div class="compare-note">&#128200; WoW Growth: ' + selMeasures[0] + ' up 0.3 pts vs prior week</div>';
+  else if (comparison === 'vs Target') compareNote = '<div class="compare-note">&#127919; vs Target: tracking 92% of target for ' + selMeasures[0] + '</div>';
+
+  var header =
+    '<div class="result-header">' +
+      '<div><div class="result-title">' + title + '</div><div class="result-meta">' + meta + '</div></div>' +
+      '<div class="result-actions">' +
+        '<button class="result-btn" onclick="exportCSV()">&#8595; Export CSV</button>' +
+        '<button class="result-btn primary" onclick="renderBuilderChart()">&#8635; Refresh</button>' +
+      '</div>' +
+    '</div>';
+
+  container.innerHTML = header + compareNote + vizHtml;
+}
+
+/* ---------- Root cause: filterable driver ranking ---------- */
+var DRIVER_DATA = {
+  All: [ {label:'Campaigns / 30 days', val:3.1}, {label:'Channel mismatch', val:1.6}, {label:'Segment', val:0.9}, {label:'Send-time mismatch', val:0.6}, {label:'Creative variant', val:0.3}, {label:'Tenure', val:0.2} ],
+  Mass: [ {label:'Channel mismatch', val:1.8}, {label:'Campaigns / 30 days', val:1.0}, {label:'Send-time mismatch', val:0.7}, {label:'Creative variant', val:0.4}, {label:'Tenure', val:0.3} ],
+  Affluent: [ {label:'Campaigns / 30 days', val:1.6}, {label:'Channel mismatch', val:1.3}, {label:'Send-time mismatch', val:0.6}, {label:'Creative variant', val:0.3}, {label:'Tenure', val:0.2} ],
+  Prime: [ {label:'Campaigns / 30 days', val:4.4}, {label:'Channel mismatch', val:1.1}, {label:'Send-time mismatch', val:0.5}, {label:'Creative variant', val:0.2}, {label:'Tenure', val:0.2} ],
+  Private: [ {label:'Campaigns / 30 days', val:1.9}, {label:'Channel mismatch', val:0.9}, {label:'Send-time mismatch', val:0.5}, {label:'Creative variant', val:0.3}, {label:'Tenure', val:0.2} ]
+};
+function renderDriverChart(data){
+  var rowH = 36, barH = 26, barStartX = 180, barMaxWidth = 300, leftLabelX = 175;
+  var maxVal = Math.max.apply(null, data.map(function(d){ return d.val; }));
+  var svgH = data.length * rowH + 16;
+  var svg = '<svg viewBox="0 0 560 ' + svgH + '" width="100%">';
+  data.forEach(function(d, i){
+    var y = 8 + i * rowH;
+    var w = Math.max(6, Math.round((d.val / maxVal) * barMaxWidth));
+    var color = i === 0 ? '#c0392b' : (i === 1 ? '#c9832e' : '#4a2f8f');
+    svg += '<rect class="bar" data-chart="driver" data-label="' + d.label + '" onclick="selectBar(this)" x="' + barStartX + '" y="' + y + '" width="' + w + '" height="' + barH + '" rx="4" fill="' + color + '"/>';
+    svg += '<text x="' + leftLabelX + '" y="' + (y + 18) + '" text-anchor="end" font-size="12" fill="#241a3d">' + d.label + '</text>';
+    svg += '<text x="' + (barStartX + w + 16) + '" y="' + (y + 18) + '" font-size="12" font-weight="700" fill="#241a3d">' + d.val.toFixed(1) + '</text>';
+  });
+  svg += '</svg>';
+  document.getElementById('driver-chart-container').innerHTML = svg;
+  document.getElementById('top-driver-name').textContent = data[0].label;
+}
+function applyRootCauseFilters(){
+  var seg = document.getElementById('rc-segment').value;
+  var data = DRIVER_DATA[seg] || DRIVER_DATA.All;
+  renderDriverChart(data);
+}
+
+/* ---------- Recommendations: what-if simulator ---------- */
+function updateWhatIf(){
+  var freqCap = parseFloat(document.getElementById('wi-freq').value);
+  var chanShift = parseFloat(document.getElementById('wi-channel').value);
+  var timeShift = parseFloat(document.getElementById('wi-time').value);
+  document.getElementById('wi-freq-val').textContent = freqCap;
+  document.getElementById('wi-channel-val').textContent = chanShift + '%';
+  document.getElementById('wi-time-val').textContent = timeShift + '%';
+
+  var baseline = 3.4;
+  var freqGain = Math.max(0, (4.6 - freqCap)) * 0.81;
+  var chanGain = (chanShift / 100) * 1.0;
+  var timeGain = (timeShift / 100) * 0.6;
+  var predicted = baseline + freqGain + chanGain + timeGain;
+  var lift = predicted - baseline;
+
+  document.getElementById('wi-predicted').textContent = predicted.toFixed(1) + '%';
+  document.getElementById('wi-lift').textContent = '+' + lift.toFixed(1) + ' pts';
+}
+
+/* ---------- Init ---------- */
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.filter-bar-slot').forEach(function(slot){
+    var prefix = slot.getAttribute('data-prefix');
+    slot.innerHTML = filterBarHTML(prefix);
+    updateShowingChip(prefix);
+  });
+  document.getElementById('builder-chart-container').innerHTML = '<div class="builder-empty"><div class="builder-empty-icon">&#128202;</div><div class="builder-empty-title">Configure your report above</div><div class="builder-empty-sub">Select at least one dimension and one measure, then Generate Report</div></div>';
+  renderDriverChart(DRIVER_DATA.All);
+  updateWhatIf();
+});
+</script>
+</body>
+</html>
