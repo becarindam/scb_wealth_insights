@@ -849,7 +849,8 @@
     Business-outcome mashup &middot; <b>Wealth Intelligence Suite</b><br>
     Data: Qlik Sense &middot;<br>
     senaps.ap.qlikcloud.com<br>
-    Confidential &mdash; SCB Wealth leadership
+    Confidential &mdash; SCB Wealth leadership<br>
+    <span style="opacity:0.8;">Wireframe rev 2 &middot; RM filter fix</span>
   </div>
 </div>
 
@@ -2216,8 +2217,24 @@ function selectCustomer(id){
 function currentCustomer(){
   return state.selectedId ? RAW_CUSTOMERS.find(c=>c.id===state.selectedId) : null;
 }
+function refreshCustomerPickers(force){
+  // The Customer ID / Customer name pickers must always list exactly the customers
+  // currently in scope (whole portfolio in Leadership view, the selected RMs' books in
+  // Individual RM view). Compare what is rendered against what should be rendered and
+  // rebuild on any difference, so the panels can never be left blank or stale.
+  const inScope = scopedCustomers();
+  const ids = inScope.map(c=>c.id), names = inScope.map(c=>c.name);
+  const rendered = Array.from(document.querySelectorAll('#mselIdPanel input[type=checkbox]')).map(i=>i.value);
+  const unchanged = rendered.length===ids.length && rendered.every((v,i)=>v===ids[i]);
+  if(unchanged && !force) return;
+  state.filters.customerIds = state.filters.customerIds.filter(v=>ids.includes(v));
+  state.filters.customerNames = state.filters.customerNames.filter(v=>names.includes(v));
+  buildMultiSelect('id');   // panel element is reused, so an open panel stays open
+  buildMultiSelect('name');
+}
 function renderAll(){
   const gateActive = state.role==='rm' && state.selectedRMs.length===0;
+  refreshCustomerPickers();
   document.getElementById('rmGatePrompt').style.display = gateActive ? 'block' : 'none';
   document.getElementById('mainContentArea').style.display = gateActive ? 'none' : 'block';
   if(gateActive) return;
@@ -2279,8 +2296,7 @@ document.getElementById('filterClearBtn').addEventListener('click', ()=>{
   document.getElementById('fInvest').value = 'all';
   document.getElementById('fLastContact').value = 'all';
   document.getElementById('fStatus').value = 'all';
-  buildMultiSelect('id');
-  buildMultiSelect('name');
+  refreshCustomerPickers(true);
   renderAll();
 });
 
@@ -2386,11 +2402,17 @@ document.getElementById('roleToggle').addEventListener('click', e=>{
   document.getElementById('grpBranch').style.display = state.role==='rm' ? 'none':'flex';
   document.getElementById('grpRM').style.display = state.role==='rm' ? 'none':'flex';
   document.getElementById('grpRMPicker').style.display = state.role==='rm' ? 'flex':'none';
+  // Hidden controls must not keep filtering: reset whatever this role can no longer see.
+  if(state.role==='rm'){
+    state.filters.branch = 'all'; document.getElementById('fBranch').value = 'all';
+    state.filters.rm = 'all';     document.getElementById('fRM').value = 'all';
+  } else {
+    state.selectedRMs.length = 0;
+  }
   state.filters.customerIds = [];
   state.filters.customerNames = [];
-  buildMultiSelect('id');
-  buildMultiSelect('name');
   buildRMMultiSelect();
+  refreshCustomerPickers(true);
   renderAll();
 });
 
