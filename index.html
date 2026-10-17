@@ -57,7 +57,16 @@
   .data-as-of { text-align: right; font-size: 11px; color: var(--muted); }
   .data-as-of .val { color: var(--navy); font-weight: 700; font-size: 12.5px; margin-top: 2px; }
   .export-btn { margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--card-border); border-radius: 999px; padding: 8px 16px; font-size: 12.5px; font-weight: 600; color: var(--navy); }
+  .ci { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; background:#ece8f7; color:#4a2f8f; font:700 10px/1 -apple-system,'Segoe UI',Arial,sans-serif; cursor:help; position:relative; margin-left:6px; vertical-align:middle; text-transform:none; letter-spacing:0; }
+  .ci:hover, .ci:focus { background:#4a2f8f; color:#fff; outline:none; }
+  .ci:hover::after, .ci:focus::after { content:attr(data-tip); position:absolute; z-index:200; top:22px; left:-8px; width:340px; max-width:78vw; background:#241a3d; color:#f1eefb; font:400 12px/1.55 -apple-system,'Segoe UI',Arial,sans-serif; padding:11px 13px; border-radius:8px; white-space:pre-line; text-align:left; font-weight:400; box-shadow:0 10px 28px rgba(20,10,50,.35); }
+  .ci.r:hover::after, .ci.r:focus::after { left:auto; right:-8px; }
+  .ci.wide:hover::after, .ci.wide:focus::after { width:560px; }
   .sample-note { font-size: 11px; color: var(--muted); font-style: italic; margin: 4px 0 18px; }
+  .synth-badge { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-style: normal; font-size: 10px; letter-spacing: .04em; text-transform: uppercase; color: #8a5a12; background: #fbf1dc; border: 1px solid #ead3a3; border-radius: 4px; padding: 2px 7px; margin-right: 8px; white-space: nowrap; }
+  .wi-note { font-size: 11.5px; color: var(--muted); margin: 14px 0 0; }
+  .wi-actions { display: flex; gap: 10px; margin: 6px 0 18px; }
+  .data-table tr.total-row td { font-weight: 700; background: #faf9fd; border-top: 2px solid var(--card-border); }
 
   /* Filter bar */
   .filter-bar { display: flex; align-items: flex-end; gap: 14px; background: #fff; border: 1px solid var(--card-border); border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; flex-wrap: wrap; }
@@ -561,6 +570,9 @@
 .ca-module .prod-status.held{ color:var(--green-dark); }
 .ca-module .prod-status.gap{ color:var(--green); }
 .ca-module .prod-status.excluded{ color:var(--text-faint); }
+.ca-module .trend-summary{ font-size:12px; color:var(--text-dim); margin-top:8px; padding:8px 10px; background:var(--panel-alt); border-radius:8px; }
+.ca-module .trend-summary:empty{ display:none; }
+.ca-module .trend-summary b{ color:var(--text); font-family:'IBM Plex Mono', monospace; font-weight:600; }
 .ca-module .trend-legend{ display:flex; gap:14px; font-size:11px; color:var(--text-dim); margin-bottom:6px; flex-wrap:wrap; }
 .ca-module .cohort-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 28px; }
 .ca-module .bullet-row{ padding:10px 0; border-bottom:1px solid var(--border); }
@@ -572,21 +584,29 @@
 .ca-module .bmedian{ position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--gray-tier); }
 .ca-module .bdot{ position:absolute; top:50%; width:11px; height:11px; border-radius:50%; background:var(--green-dark); border:2px solid #fff; box-shadow:0 0 0 1px var(--green-dark); transform:translate(-50%,-50%); }
 .ca-module .cohort-note{ font-size:11px; color:var(--text-faint); font-style:italic; margin-top:4px; }
-.ca-module .table-wrap{ overflow-x:auto; }
+.ca-module .table-wrap{ overflow:auto; max-height:560px; }
+.ca-module table.data thead th{ position:sticky; top:0; background:var(--panel); z-index:2; }
 .ca-module table.data{ width:100%; border-collapse:collapse; font-size:12px; }
 .ca-module table.data thead th{
     text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.04em;
-    color:var(--text-faint); font-weight:700; padding:7px 10px; border-bottom:2px solid var(--border);
+    color:var(--text-faint); font-weight:700; padding:7px 5px; border-bottom:2px solid var(--border);
     cursor:pointer; white-space:nowrap; user-select:none;
   }
 .ca-module table.data thead th:hover{ color:var(--text-dim); }
 .ca-module table.data thead th.sorted::after{ content:" \2193"; color:var(--green); }
 .ca-module table.data thead th.sorted-asc::after{ content:" \2191"; color:var(--green); }
-.ca-module table.data tbody td{ padding:8px 10px; border-bottom:1px solid var(--border); white-space:nowrap; }
+.ca-module table.data tbody td{ padding:8px 5px; font-size:11.5px; border-bottom:1px solid var(--border); white-space:nowrap; }
 .ca-module table.data tbody tr{ cursor:pointer; }
 .ca-module table.data tbody tr:hover{ background:var(--panel-alt); }
 .ca-module table.data tbody tr.selected{ background:var(--green-tint); }
 .ca-module table.data tbody tr.restricted{ opacity:0.55; }
+.ca-module table.data tbody tr.closed{ opacity:0.62; }
+.ca-module table.data tbody td:nth-child(3), .ca-module table.data tbody td:nth-child(8), .ca-module table.data tbody td:nth-child(9), .ca-module table.data tbody td:nth-child(10), .ca-module table.data tbody td:nth-child(12){ white-space:normal; min-width:80px; }
+.ca-module table.data tbody td:nth-child(12) .status-chip{ white-space:normal; display:inline-block; }
+.ca-module table.data thead th{ white-space:normal; vertical-align:bottom; line-height:1.25; }
+.ca-module table.data tbody td:nth-child(6), .ca-module table.data tbody td:nth-child(7){ min-width:0; }
+.ca-module .score-note{ margin-top:12px; font-size:11.5px; line-height:1.5; color:var(--text-dim); background:var(--panel-alt); border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
+.ca-module .score-note b{ display:block; color:var(--text); font-size:11.5px; margin-bottom:2px; }
 .ca-module .rank-pill{ font-family:'IBM Plex Mono', monospace; font-weight:700; background:var(--panel-alt); border-radius:5px; padding:2px 7px; }
 .ca-module .status-chip{ font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:999px; white-space:nowrap; }
 .ca-module .st-Identified{ background:var(--gray-tint); color:var(--gray-tier); }
@@ -847,10 +867,8 @@
 
   <div class="sidebar-footer">
     Business-outcome mashup &middot; <b>Wealth Intelligence Suite</b><br>
-    Data: Qlik Sense &middot;<br>
-    senaps.ap.qlikcloud.com<br>
-    Confidential &mdash; SCB Wealth leadership<br>
-    <span style="opacity:0.8;">Wireframe rev 2 &middot; RM filter fix</span>
+    Illustrative synthetic data &mdash; not SCB data<br>
+    Confidential &mdash; SCB Wealth leadership
   </div>
 </div>
 
@@ -865,12 +883,13 @@
         <p class="page-desc">Click-through performance across SCB Easy and SCB Connect &mdash; drivers, root cause, and recommended actions.</p>
       </div>
       <div>
-        <div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div>
+        <div class="data-as-of">DATA<div class="val">Illustrative &middot; synthetic</div></div>
         <div class="export-btn"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>Export summary</div>
       </div>
     </div>
-    <div class="sample-note">Sample data for wireframe reference only. Filters below recompute the KPI row and highlight the matching chart bar.</div>
+    <div class="sample-note"><span class="synth-badge">Illustrative synthetic data</span>Not SCB data. Filters below recompute the KPI row and highlight the matching chart bar.</div>
 
+    <div class="sample-note" id="ov-cust-note" style="display:none"></div>
     <div class="filter-bar-slot" data-prefix="ov"></div>
 
     <div class="exec-banner">
@@ -884,9 +903,9 @@
     <div class="section-label"><span class="tick amber"></span>OVERALL KPIS</div>
     <div class="kpi-row">
       <div class="kpi-card navy"><div class="kpi-label">OVERALL CTR</div><div class="kpi-value" id="kpi-ctr">3.4%</div><div class="kpi-delta bad" id="kpi-ctr-delta">&#9660; 0.5 pts vs last month</div></div>
-      <div class="kpi-card teal"><div class="kpi-label">AVG CAMPAIGNS / CUSTOMER (30D)</div><div class="kpi-value" id="kpi-campaigns">4.6</div><div class="kpi-delta bad">&#9650; 0.8 vs last month</div></div>
-      <div class="kpi-card amber"><div class="kpi-label">CLICK-TO-CONVERSION RATE</div><div class="kpi-value" id="kpi-conv">0.9%</div><div class="kpi-delta flat">&#8212; flat vs last month</div></div>
-      <div class="kpi-card red"><div class="kpi-label">FREQUENCY-SUPPRESSED REACH</div><div class="kpi-value" id="kpi-suppressed">38%</div><div class="kpi-delta bad">&#9650; 6 pts vs last month</div></div>
+      <div class="kpi-card teal"><div class="kpi-label">AVG MESSAGES / CUSTOMER (30D)</div><div class="kpi-value" id="kpi-campaigns">4.6</div><div class="kpi-delta bad" id="kpi-campaigns-delta">&#9650; 0.8 vs last month</div></div>
+      <div class="kpi-card amber"><div class="kpi-label">CLICK-TO-CONVERSION RATE</div><div class="kpi-value" id="kpi-conv">0.9%</div><div class="kpi-delta flat" id="kpi-conv-delta">&#8212; flat vs last month</div></div>
+      <div class="kpi-card red"><div class="kpi-label">FREQUENCY-SUPPRESSED REACH<span class="ci r" tabindex="0" data-tip="What it means&#10;Share of the customers we reached whose likelihood to click is being held down by how often we contact them (message fatigue).&#10;&#10;How it is derived&#10;The response model compares each customer's predicted click likelihood at their current contact level with the same customer at light contact (1–2 campaigns in 30 days). If it is materially lower, the customer counts as frequency-suppressed.&#10;&#10;Illustrative figure.">i</span></div><div class="kpi-value" id="kpi-suppressed">38%</div><div class="kpi-delta bad" id="kpi-suppressed-delta">&#9650; 6 pts vs last month</div></div>
     </div>
 
     <div class="section-label"><span class="tick purple"></span>PERFORMANCE BREAKDOWN</div>
@@ -899,14 +918,14 @@
           <rect class="bar" data-chart="channel" data-label="Push" onclick="selectBar(this)" x="35" y="110" width="46" height="40" rx="4" fill="#241a3d"/>
           <text x="58" y="103" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">2.1%</text>
           <text x="58" y="166" text-anchor="middle" font-size="11" fill="#6b6486">Push</text>
-          <rect class="bar" data-chart="channel" data-label="Email" onclick="selectBar(this)" x="117" y="59" width="46" height="91" rx="4" fill="#241a3d"/>
-          <text x="140" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">4.8%</text>
+          <rect class="bar" data-chart="channel" data-label="Email" onclick="selectBar(this)" x="117" y="70" width="46" height="80" rx="4" fill="#241a3d"/>
+          <text x="140" y="63" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">4.2%</text>
           <text x="140" y="166" text-anchor="middle" font-size="11" fill="#6b6486">Email</text>
-          <rect class="bar" data-chart="channel" data-label="In-app" onclick="selectBar(this)" x="199" y="30" width="46" height="120" rx="4" fill="#241a3d"/>
-          <text x="222" y="23" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">6.3%</text>
+          <rect class="bar" data-chart="channel" data-label="In-app" onclick="selectBar(this)" x="199" y="47" width="46" height="103" rx="4" fill="#241a3d"/>
+          <text x="222" y="40" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">5.4%</text>
           <text x="222" y="166" text-anchor="middle" font-size="11" fill="#6b6486">In-app</text>
         </svg>
-        <div class="chart-foot">In-app leads; push under-performs by 4.2 pts</div>
+        <div class="chart-foot">In-app leads; push trails in-app by 3.3 pts</div>
       </div>
 
       <div class="chart-card">
@@ -914,24 +933,24 @@
         <div class="selection-chip" id="chip-segment" onclick="clearChart('segment')"></div>
         <svg viewBox="0 0 280 180" width="100%">
           <line x1="12" y1="150" x2="268" y2="150" stroke="#e6e2f2" stroke-width="1"/>
-          <rect class="bar" data-chart="segment" data-label="Mass" onclick="selectBar(this)" x="24" y="38" width="38" height="112" rx="4" fill="#4a2f8f"/>
-          <text x="43" y="31" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">5.9%</text>
+          <rect class="bar" data-chart="segment" data-label="Mass" onclick="selectBar(this)" x="24" y="55" width="38" height="95" rx="4" fill="#4a2f8f"/>
+          <text x="43" y="48" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">5.0%</text>
           <text x="43" y="166" text-anchor="middle" font-size="10.5" fill="#6b6486">Mass</text>
-          <rect class="bar" data-chart="segment" data-label="Affluent" onclick="selectBar(this)" x="90" y="60" width="38" height="90" rx="4" fill="#4a2f8f"/>
-          <text x="109" y="53" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">4.7%</text>
+          <rect class="bar" data-chart="segment" data-label="Affluent" onclick="selectBar(this)" x="90" y="70" width="38" height="80" rx="4" fill="#4a2f8f"/>
+          <text x="109" y="63" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">4.2%</text>
           <text x="109" y="166" text-anchor="middle" font-size="10.5" fill="#6b6486">Affluent</text>
-          <rect class="bar" data-chart="segment" data-label="Prime" onclick="selectBar(this)" x="156" y="97" width="38" height="53" rx="4" fill="#c0392b"/>
-          <text x="175" y="90" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c0392b">2.8%</text>
+          <rect class="bar" data-chart="segment" data-label="Prime" onclick="selectBar(this)" x="156" y="106" width="38" height="44" rx="4" fill="#c0392b"/>
+          <text x="175" y="99" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c0392b">2.3%</text>
           <text x="175" y="166" text-anchor="middle" font-size="10.5" fill="#6b6486">Prime</text>
-          <rect class="bar" data-chart="segment" data-label="Private" onclick="selectBar(this)" x="222" y="83" width="38" height="67" rx="4" fill="#4a2f8f"/>
-          <text x="241" y="76" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">3.5%</text>
+          <rect class="bar" data-chart="segment" data-label="Private" onclick="selectBar(this)" x="222" y="95" width="38" height="55" rx="4" fill="#4a2f8f"/>
+          <text x="241" y="88" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241a3d">2.9%</text>
           <text x="241" y="166" text-anchor="middle" font-size="10.5" fill="#6b6486">Private</text>
         </svg>
         <div class="chart-foot">Prime is the weakest segment &mdash; matches executive flag</div>
       </div>
 
       <div class="chart-card">
-        <div class="chart-card-head"><div><div class="chart-title">CTR by Frequency Bucket</div><div class="chart-sub">Campaigns received, trailing 30 days</div></div><span class="tag frequency">FREQUENCY</span></div>
+        <div class="chart-card-head"><div><div class="chart-title">CTR by Frequency Bucket<span class="ci r" tabindex="0" data-tip="What the buckets mean&#10;Customers are grouped by how many campaign messages they received in the last 30 days, across all channels. 1–2 = lightly contacted; 7+ = heavily contacted.&#10;&#10;How to read it&#10;Each bar is the click-through rate of that group: customers who received 1–2 messages click at 6.5%; customers who received 7 or more click at 1.4%. More messages did not mean more clicks — it meant fewer.">i</span></div><div class="chart-sub">Messages received, trailing 30 days</div></div><span class="tag frequency">FREQUENCY</span></div>
         <div class="selection-chip" id="chip-freq" onclick="clearChart('freq')"></div>
         <svg viewBox="0 0 280 180" width="100%">
           <line x1="12" y1="150" x2="268" y2="150" stroke="#e6e2f2" stroke-width="1"/>
@@ -952,17 +971,20 @@
       </div>
     </div>
 
-    <div class="section-label"><span class="tick teal"></span>CAMPAIGN PERFORMANCE DETAIL</div>
+    <div class="section-label"><span class="tick teal"></span>CAMPAIGN PERFORMANCE DETAIL <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted);">&mdash; top campaigns by sends; total reconciles to the KPI above</span></div>
     <div class="card-plain" style="padding:0; overflow:hidden;">
       <table class="data-table">
-        <thead><tr><th>Campaign</th><th>Channel</th><th>Segment</th><th>Sends</th><th>CTR</th><th>Conversion</th><th>Avg Frequency (30d)</th></tr></thead>
+        <thead><tr><th>Campaign</th><th>Channel</th><th>Segment</th><th>Sends</th><th>CTR</th><th>Conversion (of sends)</th><th>Avg Frequency (30d)</th></tr></thead>
         <tbody>
           <tr><td>Prime Wealth Digest</td><td>Push</td><td>Prime</td><td>18,400</td><td>1.6%</td><td>0.3%</td><td>7.2</td></tr>
-          <tr><td>New Fund Launch</td><td>Email</td><td>Affluent</td><td>22,100</td><td>4.9%</td><td>1.1%</td><td>3.8</td></tr>
-          <tr><td>Portfolio Check-in</td><td>In-app</td><td>Mass</td><td>31,050</td><td>6.7%</td><td>1.4%</td><td>2.1</td></tr>
+          <tr><td>New Fund Launch</td><td>Email</td><td>Affluent</td><td>22,100</td><td>4.3%</td><td>1.0%</td><td>3.8</td></tr>
+          <tr><td>Portfolio Check-in</td><td>In-app</td><td>Mass</td><td>31,050</td><td>5.2%</td><td>1.1%</td><td>2.1</td></tr>
           <tr><td>Private Banking Invite</td><td>Push</td><td>Prime</td><td>6,200</td><td>1.9%</td><td>0.4%</td><td>6.5</td></tr>
-          <tr><td>Year-End Review</td><td>Email</td><td>Private</td><td>9,800</td><td>3.9%</td><td>0.9%</td><td>3.0</td></tr>
-          <tr><td>Rate Change Alert</td><td>In-app</td><td>Affluent</td><td>27,300</td><td>5.8%</td><td>1.2%</td><td>2.4</td></tr>
+          <tr><td>Prime Portfolio Check-in</td><td>In-app</td><td>Prime</td><td>13,800</td><td>3.4%</td><td>0.6%</td><td>2.3</td></tr>
+          <tr><td>Year-End Review</td><td>Email</td><td>Private</td><td>9,800</td><td>3.0%</td><td>0.7%</td><td>3.0</td></tr>
+          <tr><td>Rate Change Alert</td><td>In-app</td><td>Affluent</td><td>27,300</td><td>5.4%</td><td>1.1%</td><td>2.4</td></tr>
+          <tr><td>All other campaigns</td><td>Mixed</td><td>Mixed</td><td>60,000</td><td>2.0%</td><td>0.4%</td><td>5.0</td></tr>
+          <tr class="total-row"><td>Total &mdash; all campaigns</td><td></td><td></td><td>188,650</td><td>3.4%</td><td>&mdash;</td><td>4.6</td></tr>
         </tbody>
       </table>
     </div>
@@ -976,48 +998,31 @@
         <h1 class="page-title">Explore</h1>
         <p class="page-desc">Drill into CTR performance by any dimension, or build a custom view below.</p>
       </div>
-      <div><div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div></div>
+      <div><div class="data-as-of">DATA<div class="val">Illustrative &middot; synthetic</div></div></div>
     </div>
+    <div class="sample-note"><span class="synth-badge">Illustrative synthetic data</span>Not SCB data.</div>
     <div class="filter-bar-slot" data-prefix="ex"></div>
 
     <div class="chart-row two">
       <div class="chart-card">
-        <div class="chart-card-head"><div><div class="chart-title">CTR Trend</div><div class="chart-sub">Weekly, last 8 weeks</div></div><span class="tag trend">TREND</span></div>
-        <svg viewBox="0 0 480 180" width="100%">
-          <line x1="20" y1="150" x2="460" y2="150" stroke="#e6e2f2" stroke-width="1"/>
-          <polyline points="30,52 90,58 150,68 210,80 270,86 330,100 390,105 450,110" fill="none" stroke="#4a2f8f" stroke-width="2.5"/>
-          <circle cx="30" cy="52" r="4" fill="#4a2f8f"/><circle cx="90" cy="58" r="4" fill="#4a2f8f"/><circle cx="150" cy="68" r="4" fill="#4a2f8f"/><circle cx="210" cy="80" r="4" fill="#4a2f8f"/><circle cx="270" cy="86" r="4" fill="#4a2f8f"/><circle cx="330" cy="100" r="4" fill="#4a2f8f"/><circle cx="390" cy="105" r="4" fill="#c0392b"/><circle cx="450" cy="110" r="4" fill="#c0392b"/>
-          <text x="30" y="42" text-anchor="middle" font-size="10.5" fill="#6b6486">4.6%</text>
-          <text x="450" y="100" text-anchor="middle" font-size="10.5" font-weight="700" fill="#c0392b">3.4%</text>
-          <text x="30" y="166" text-anchor="middle" font-size="10" fill="#6b6486">W1</text><text x="450" y="166" text-anchor="middle" font-size="10" fill="#6b6486">W8</text>
-        </svg>
-        <div class="chart-foot">Steady decline since week 5, coinciding with higher send frequency</div>
+        <div class="chart-card-head"><div><div class="chart-title">CTR Trend</div><div class="chart-sub" id="ex-trend-sub">Weekly, last 8 weeks</div></div><span class="tag trend">TREND</span></div>
+        <div id="ex-trend-container"></div>
+        <div class="chart-foot" id="ex-trend-foot">Steady decline since week 5, coinciding with higher send frequency</div>
       </div>
       <div class="chart-card">
         <div class="chart-card-head"><div><div class="chart-title">CTR by Creative Variant</div><div class="chart-sub">A/B/C, current quarter</div></div><span class="tag channel">CREATIVE</span></div>
         <div class="selection-chip" id="chip-creative" onclick="clearChart('creative')"></div>
-        <svg viewBox="0 0 280 180" width="100%">
-          <line x1="20" y1="150" x2="260" y2="150" stroke="#e6e2f2" stroke-width="1"/>
-          <rect class="bar" data-chart="creative" data-label="Variant A" onclick="selectBar(this)" x="35" y="70" width="46" height="80" rx="4" fill="#241a3d"/>
-          <text x="58" y="63" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">3.8%</text>
-          <text x="58" y="166" text-anchor="middle" font-size="11" fill="#6b6486">A</text>
-          <rect class="bar" data-chart="creative" data-label="Variant B" onclick="selectBar(this)" x="117" y="87" width="46" height="63" rx="4" fill="#241a3d"/>
-          <text x="140" y="80" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">3.1%</text>
-          <text x="140" y="166" text-anchor="middle" font-size="11" fill="#6b6486">B</text>
-          <rect class="bar" data-chart="creative" data-label="Variant C" onclick="selectBar(this)" x="199" y="74" width="46" height="76" rx="4" fill="#241a3d"/>
-          <text x="222" y="67" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">3.6%</text>
-          <text x="222" y="166" text-anchor="middle" font-size="11" fill="#6b6486">C</text>
-        </svg>
-        <div class="chart-foot">Variants are close &mdash; creative is not the leading driver</div>
+        <div id="ex-creative-container"></div>
+        <div class="chart-foot" id="ex-creative-foot">Variants are close &mdash; creative is not the leading driver</div>
       </div>
     </div>
 
     <div class="section-label"><span class="tick amber"></span>BUILD YOUR OWN VIEW</div>
     <div class="builder-split">
       <div class="builder-panel-col">
-        <div class="builder-panel-head">&#9881; REPORT BUILDER</div>
+        <div class="builder-panel-head">REPORT BUILDER</div>
         <div class="builder-group">
-          <div class="builder-group-label">&#128208; DIMENSIONS / ATTRIBUTES <span style="font-weight:500;">(select one or more)</span></div>
+          <div class="builder-group-label">DIMENSIONS / ATTRIBUTES <span style="font-weight:500;">(select one or more)</span></div>
           <div class="pill-row" id="builder-dims">
             <button class="pill-toggle" data-value="Channel" onclick="togglePill(this)">Channel</button>
             <button class="pill-toggle" data-value="Segment" onclick="togglePill(this)">Segment</button>
@@ -1026,7 +1031,7 @@
           </div>
         </div>
         <div class="builder-group">
-          <div class="builder-group-label">&#128202; MEASURES / KPIS <span style="font-weight:500;">(select one or more)</span></div>
+          <div class="builder-group-label">MEASURES / KPIS <span style="font-weight:500;">(select one or more)</span></div>
           <div class="pill-row" id="builder-measures">
             <button class="pill-toggle" data-value="CTR" onclick="togglePill(this)">CTR</button>
             <button class="pill-toggle" data-value="Conversion rate" onclick="togglePill(this)">Conversion rate</button>
@@ -1036,7 +1041,7 @@
           </div>
         </div>
         <div class="builder-group">
-          <div class="builder-group-label">&#9201; TIME PERIOD</div>
+          <div class="builder-group-label">TIME PERIOD</div>
           <div class="pill-row" id="builder-period">
             <button class="pill-toggle single" data-value="Last 7 days" onclick="selectSingle(this,'builder-period')">Last 7 days</button>
             <button class="pill-toggle single selected" data-value="Last 30 days" onclick="selectSingle(this,'builder-period')">Last 30 days</button>
@@ -1045,7 +1050,7 @@
           </div>
         </div>
         <div class="builder-group">
-          <div class="builder-group-label">&#128256; COMPARISON</div>
+          <div class="builder-group-label">COMPARISON</div>
           <div class="pill-row" id="builder-comparison">
             <button class="pill-toggle single" data-value="WoW Growth" onclick="selectSingle(this,'builder-comparison')">WoW Growth</button>
             <button class="pill-toggle single" data-value="vs Target" onclick="selectSingle(this,'builder-comparison')">vs Target</button>
@@ -1053,7 +1058,7 @@
           </div>
         </div>
         <div class="builder-group">
-          <div class="builder-group-label">&#128200; CHART TYPE</div>
+          <div class="builder-group-label">CHART TYPE</div>
           <div class="chart-type-grid" id="builder-chart-types">
             <button class="chart-type-tile selected" data-type="Bar" onclick="selectChartType(this)">
               <svg viewBox="0 0 24 24"><rect x="4" y="10" width="4" height="10" fill="currentColor"/><rect x="10" y="5" width="4" height="15" fill="currentColor"/><rect x="16" y="13" width="4" height="7" fill="currentColor"/></svg>
@@ -1081,10 +1086,10 @@
             </button>
           </div>
         </div>
-        <button class="generate-btn" onclick="renderBuilderChart()">&#9889; Generate Report</button>
+        <button class="generate-btn" onclick="renderBuilderChart()">Generate Report</button>
       </div>
       <div class="builder-output-col" id="builder-output-col">
-        <div class="builder-panel-head">&#128202; REPORT OUTPUT</div>
+        <div class="builder-panel-head">REPORT OUTPUT</div>
         <div id="builder-chart-container"></div>
       </div>
     </div>
@@ -1096,22 +1101,23 @@
       <div>
         <div class="eyebrow">CAMPAIGN EFFECTIVENESS</div>
         <h1 class="page-title">Root cause</h1>
-        <p class="page-desc">Confirmed drivers of the CTR gap, ranked by contribution and controlled for interaction effects.</p>
+        <p class="page-desc">Leading drivers of the CTR gap, ranked by model contribution (SHAP). An association view &mdash; the pilot on the Recommendations page tests causation.</p>
       </div>
-      <div><div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div></div>
+      <div><div class="data-as-of">DATA<div class="val">Illustrative &middot; synthetic</div></div></div>
     </div>
+    <div class="sample-note"><span class="synth-badge">Illustrative synthetic data</span>Not SCB data.</div>
     <div class="filter-bar-slot" data-prefix="rc"></div>
 
     <div class="chart-card" style="margin-bottom:24px;">
-      <div class="chart-card-head"><div><div class="chart-title">Driver Ranking</div><div class="chart-sub">Mean impact on CTR, percentage points</div></div><span class="tag driver">SHAP RANKED</span></div>
+      <div class="chart-card-head"><div><div class="chart-title">Driver Ranking<span class="ci wide" tabindex="0" data-tip="How this chart is derived (illustrative)&#10;&#10;1. Source: the SCB Easy / SCB Connect campaign feed (sends, clicks, channel, creative, send time), joined to core banking and CRM attributes (segment, tenure, usual channel, usual active hours).&#10;2. One row per customer per 30-day window. The outcome to explain is whether the customer clicked (CTR).&#10;3. Candidate drivers, each built from the joined data:&#10;• Messages in 30 days: count of campaign messages sent to the customer in the trailing 30 days (7+ = over-contact).&#10;• Channel mismatch: sent on a channel other than the one the customer engages with most (from past clicks, opens and app usage, within consent).&#10;• Send-time mismatch: sent outside the hours the customer is usually active (from timestamps of past app sessions, opens and clicks).&#10;• Creative variant: the creative ID / variant on the send record.&#10;• Segment and tenure: from CRM.&#10;4. A model learns how those drivers relate to clicking (Qlik Predict, no-code).&#10;5. For each driver, SHAP values measure how many percentage points it adds or removes from the predicted CTR, averaged over customers. The bar is that average impact.&#10;&#10;Read it as: which levers move CTR most. It shows association, not proof of cause; the control-group pilot on the Recommendations page tests it.">i</span></div><div class="chart-sub">Mean impact on CTR, percentage points</div></div><span class="tag driver">SHAP RANKED</span></div>
       <div class="selection-chip" id="chip-driver" onclick="clearChart('driver')"></div>
-      <div id="driver-chart-container"></div>
-      <div class="chart-foot">Ranked using SHAP values, which control for interaction between features &mdash; not a raw correlation.</div>
+      <div id="driver-chart-container" style="max-width:760px;"></div>
+      <div class="chart-foot">SHAP values show how much each factor contributes to the model&rsquo;s CTR prediction. They indicate association, not causation.</div>
     </div>
 
     <div class="card-plain">
-      <div style="font-weight:700; font-size:15px; margin-bottom:8px;">Top driver: <span id="top-driver-name">Campaigns / 30 days</span></div>
-      <p style="font-size:13.5px; line-height:1.6; color:var(--ink); margin:0;">Customers receiving 7 or more campaigns in a trailing 30-day window show a CTR of 1.4%, against 6.5% for customers receiving 1&ndash;2. This driver alone accounts for roughly twice the impact of the next-ranked factor. This is a correlation-adjusted ranking, not proof of causation &mdash; see Recommendations for how the pilot validates it before scale.</p>
+      <div style="font-weight:700; font-size:15px; margin-bottom:8px;">Top driver: <span id="top-driver-name">Messages in 30 days</span></div>
+      <p id="top-driver-text" style="font-size:13.5px; line-height:1.6; color:var(--ink); margin:0;"></p>
     </div>
   </div>
 
@@ -1123,22 +1129,22 @@
         <h1 class="page-title">Behavior Impact</h1>
         <p class="page-desc">Closing the loop from clicks to money &mdash; how campaign engagement relates to actual transaction and AUM behavior.</p>
       </div>
-      <div><div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div></div>
+      <div><div class="data-as-of">DATA<div class="val">Illustrative &middot; synthetic</div></div></div>
     </div>
-    <div class="sample-note">Sample data for wireframe reference only &mdash; illustrates the kind of insight this view surfaces once connected to real transaction data.</div>
+    <div class="sample-note"><span class="synth-badge">Illustrative synthetic data</span>Not SCB data. Comparisons are unadjusted associations, not proof of causation &mdash; attribution would be confirmed with a matched control or holdout group.</div>
 
     <div class="section-label"><span class="tick amber"></span>ENGAGEMENT-TO-REVENUE KPIS</div>
     <div class="kpi-row">
-      <div class="kpi-card navy"><div class="kpi-label">TRANSACTION LIFT, POST-ENGAGEMENT</div><div class="kpi-value">+18.4%</div><div class="kpi-delta" style="color:var(--teal);">&#9650; vs. non-engaged customers</div></div>
-      <div class="kpi-card teal"><div class="kpi-label">AVG AUM GROWTH, ENGAGED VS. NOT</div><div class="kpi-value">+2.4M</div><div class="kpi-delta flat">THB per customer, 90 days</div></div>
+      <div class="kpi-card navy"><div class="kpi-label">TRANSACTION LIFT GAP, ENGAGED VS. NOT<span class="ci" tabindex="0" data-tip="What it compares&#10;Customers who engaged with a campaign (clicked) versus customers who did not, using how much their average transaction value changed between the 30 days before and the 30 days after the first campaign touch.&#10;&#10;Engaged +78% vs not engaged +17% = a gap of 61 points.&#10;&#10;Caution: unadjusted. Customers who engage tend to be the already-active ones, so this shows association, not that the campaign caused the increase.">i</span></div><div class="kpi-value">+61 pts</div><div class="kpi-delta" style="color:var(--teal);">engaged +78% vs not engaged +17% (unadjusted)</div></div>
+      <div class="kpi-card teal"><div class="kpi-label">AVG AUM GROWTH, ENGAGED VS. NOT</div><div class="kpi-value">+24K</div><div class="kpi-delta flat">THB per customer, 90 days (unadjusted)</div></div>
       <div class="kpi-card amber"><div class="kpi-label">DORMANT CUSTOMERS REACTIVATED</div><div class="kpi-value">1,240</div><div class="kpi-delta flat">via a campaign touch, trailing quarter</div></div>
-      <div class="kpi-card red"><div class="kpi-label">REVENUE ATTRIBUTABLE TO CAMPAIGNS</div><div class="kpi-value">~12.6M</div><div class="kpi-delta flat">THB, illustrative estimate</div></div>
+      <div class="kpi-card red"><div class="kpi-label">REVENUE ASSOCIATED WITH ENGAGEMENT</div><div class="kpi-value">~12.6M</div><div class="kpi-delta flat">THB, illustrative &middot; not yet causal</div></div>
     </div>
 
     <div class="section-label"><span class="tick purple"></span>DOES ENGAGEMENT ACTUALLY MOVE TRANSACTIONS?</div>
     <div class="chart-row two">
       <div class="chart-card">
-        <div class="chart-card-head"><div><div class="chart-title">Transaction Value: Before vs. After Engagement</div><div class="chart-sub">Avg per customer, 30 days pre/post a campaign touch</div></div><span class="tag trend">TRANSACTIONS</span></div>
+        <div class="chart-card-head"><div><div class="chart-title">Transaction Value: Before vs. After Engagement<span class="ci" tabindex="0" data-tip="What it shows&#10;Average transaction value per customer in the 30 days BEFORE and the 30 days AFTER a campaign touch, for customers who did not engage (left pair) and customers who did (right pair).&#10;&#10;Before the touch both groups transact at similar levels (42K vs 45K). After it, engaged customers rise to 80K and the rest to 49K.&#10;&#10;Association only: engaged customers may already have been warming up. A control group would confirm the effect.">i</span></div><div class="chart-sub">Avg per customer, 30 days pre/post a campaign touch</div></div><span class="tag trend">TRANSACTIONS</span></div>
         <svg viewBox="0 0 320 200" width="100%">
           <line x1="20" y1="164" x2="300" y2="164" stroke="#e6e2f2"/>
           <rect x="35" y="104" width="42" height="60" rx="4" fill="#b4b2a9"/>
@@ -1154,7 +1160,7 @@
           <text x="221" y="180" text-anchor="middle" font-size="10.5" fill="#6b6486">Engaged</text>
         </svg>
         <div class="chart-legend"><span class="legend-item"><span class="legend-dot" style="background:#b4b2a9"></span>Pre (30d before)</span><span class="legend-item"><span class="legend-dot" style="background:#4a2f8f"></span>Post, not engaged</span><span class="legend-item"><span class="legend-dot" style="background:#0f6e56"></span>Post, engaged</span></div>
-        <div class="chart-foot">Engaged customers grew transaction value ~4x more than those who didn't engage</div>
+        <div class="chart-foot">Engaged customers&rsquo; transaction value rose ~78% vs ~17% for those who didn&rsquo;t engage &mdash; unadjusted; engaged customers were already more active</div>
       </div>
 
       <div class="chart-card">
@@ -1205,16 +1211,17 @@
         <h1 class="page-title">Recommendations</h1>
         <p class="page-desc">Prioritized actions for the marketing team, validated with a control group before scale.</p>
       </div>
-      <div><div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div></div>
+      <div><div class="data-as-of">DATA<div class="val">Illustrative &middot; synthetic</div></div></div>
     </div>
+    <div class="sample-note"><span class="synth-badge">Illustrative synthetic data</span>Not SCB data.</div>
     <div class="filter-bar-slot" data-prefix="rec"></div>
 
     <div class="section-label"><span class="tick purple"></span>PRIORITIZED ACTIONS</div>
     <div class="card-plain" style="padding:0; overflow:hidden; margin-bottom:28px;">
       <table class="data-table">
-        <thead><tr><th>Segment</th><th>Confirmed driver</th><th>Recommended action</th><th>Expected CTR lift</th><th>Owner</th></tr></thead>
+        <thead><tr><th>Segment</th><th>Leading driver</th><th>Recommended action</th><th>Expected CTR lift (within segment)</th><th>Owner</th></tr></thead>
         <tbody>
-          <tr><td>Prime</td><td>Frequency fatigue</td><td>Cap sends to 2 per month</td><td>+2.1 pts</td><td>Marketing Ops</td></tr>
+          <tr><td>Prime</td><td>Frequency fatigue</td><td>Cap sends to 2 per 30 days</td><td>+2.1 pts</td><td>Marketing Ops</td></tr>
           <tr><td>Mass</td><td>Channel mismatch</td><td>Shift push-heavy sends to email / in-app</td><td>+1.0 pts</td><td>Campaign Team</td></tr>
           <tr><td>Affluent</td><td>Timing mismatch</td><td>Align send time to active hours</td><td>+0.6 pts</td><td>Campaign Team</td></tr>
           <tr><td>All segments</td><td>Creative variant</td><td>Monitor only &mdash; low impact, no action needed</td><td>&mdash;</td><td>&mdash;</td></tr>
@@ -1224,8 +1231,9 @@
 
     <div class="section-label"><span class="tick teal"></span>WHAT-IF SCENARIO ANALYSIS</div>
     <div class="whatif-card" style="margin-bottom:28px;">
+      <div class="wi-actions"><button class="result-btn primary" onclick="applyRecommended()">Apply recommended scenario</button><button class="result-btn" onclick="resetWhatIf()">Reset to current</button></div>
       <div class="slider-row">
-        <div class="slider-row-head"><span>Frequency cap (campaigns / 30 days)</span><span class="val" id="wi-freq-val">8</span></div>
+        <div class="slider-row-head"><span>Frequency cap (messages / 30 days)</span><span class="val" id="wi-freq-val">8</span></div>
         <input type="range" min="1" max="8" step="1" value="8" id="wi-freq" oninput="updateWhatIf()">
       </div>
       <div class="slider-row">
@@ -1241,16 +1249,17 @@
         <div class="pilot-box"><div class="n" style="color:var(--teal)" id="wi-predicted">3.4%</div><div class="l">Predicted CTR</div></div>
         <div class="pilot-box"><div class="n" style="color:var(--green)" id="wi-lift">+0.0 pts</div><div class="l">Projected lift</div></div>
       </div>
+      <p class="wi-note">Portfolio view: each action&rsquo;s within-segment lift (table above) is weighted by that segment&rsquo;s share of sends &mdash; Prime 40%, Affluent 25%, Mass 20%. Illustrative.</p>
     </div>
 
-    <div class="section-label"><span class="tick teal"></span>PILOT RESULTS</div>
+    <div class="section-label"><span class="tick teal"></span>EXPECTED PILOT READOUT <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted);">&mdash; illustrative</span></div>
     <div class="card-plain">
       <div class="pilot-row">
-        <div class="pilot-box"><div class="n" style="color:var(--muted)">3.1%</div><div class="l">Control group CTR</div></div>
+        <div class="pilot-box"><div class="n" style="color:var(--muted)">2.3%</div><div class="l">Control group CTR (Prime)</div></div>
         <div class="pilot-box"><div class="n" style="color:var(--teal)">4.2%</div><div class="l">Treatment group CTR (frequency cap applied)</div></div>
-        <div class="pilot-box"><div class="n" style="color:#2f8f5b">+35%</div><div class="l">Relative lift, statistically significant</div></div>
+        <div class="pilot-box"><div class="n" style="color:#2f8f5b">+1.9 pts</div><div class="l">Lift vs control (+83% relative)</div></div>
       </div>
-      <p style="font-size:12.5px; color:var(--muted); margin:16px 0 0;">Pilot run on Prime segment, 4 weeks, holdout control group sized to match treatment. Illustrative figures for wireframe reference.</p>
+      <p style="font-size:12.5px; color:var(--muted); margin:16px 0 0;">Target design: Prime segment, 4 weeks, holdout control group sized to match treatment. Figures are illustrative; statistical significance would be confirmed on real sample sizes at readout.</p>
     </div>
   </div>
 
@@ -1260,23 +1269,23 @@
       <div>
         <div class="eyebrow">CAMPAIGN EFFECTIVENESS</div>
         <h1 class="page-title">Data &amp; governance</h1>
-        <p class="page-desc">Integration status, refresh cadence, and consent rules underlying this analysis.</p>
+        <p class="page-desc">Target integration design, refresh cadence, and consent rules for this analysis.</p>
       </div>
-      <div><div class="data-as-of">DATA AS OF<div class="val">5 Sep 2026, 06:00</div></div></div>
+      <div><div class="data-as-of">DATA<div class="val">Illustrative &middot; synthetic</div></div></div>
     </div>
     <div class="filter-bar-slot" data-prefix="gov"></div>
-    <div class="sample-note">Filters above scope the campaign views on other tabs; source-level status below reflects the full pipeline regardless of selection.</div>
+    <div class="sample-note"><span class="synth-badge">Illustrative synthetic data</span>Target integration design &mdash; no SCB systems are connected in this prototype.</div>
 
     <div class="section-label"><span class="tick purple"></span>DATA SOURCES</div>
     <div class="card-plain" style="padding:0; overflow:hidden; margin-bottom:28px;">
       <table class="data-table">
-        <thead><tr><th>Source</th><th>Provides</th><th>Records</th><th>Last refreshed</th><th>Cadence</th><th>Status</th></tr></thead>
+        <thead><tr><th>Source</th><th>Provides</th><th>Volume (illustrative)</th><th>Target cadence</th><th>Status</th></tr></thead>
         <tbody>
-          <tr><td>SCB Connect</td><td>Campaign feed: impression, channel, click, creative</td><td>2,410,000</td><td>Today, 05:12</td><td>Every 4 hours</td><td><span class="status-pill on">Connected</span></td></tr>
-          <tr><td>SCB Easy</td><td>Campaign feed: impression, channel, click, creative</td><td>3,120,500</td><td>Today, 05:12</td><td>Every 4 hours</td><td><span class="status-pill on">Connected</span></td></tr>
-          <tr><td>Core banking transactions</td><td>Product holding, activity recency and frequency, AUM tier</td><td>8,760,000</td><td>Today, 02:00</td><td>Daily</td><td><span class="status-pill on">Connected</span></td></tr>
-          <tr><td>CRM / demographics</td><td>Age band, income tier, relationship tier, tenure</td><td>1,180,000</td><td>Yesterday, 22:00</td><td>Daily</td><td><span class="status-pill on">Connected</span></td></tr>
-          <tr><td>External market enrichment</td><td>Industry benchmark data</td><td>&mdash;</td><td>&mdash;</td><td>Not scheduled</td><td><span class="status-pill off">Not enabled</span></td></tr>
+          <tr><td>SCB Connect</td><td>Campaign feed: impression, channel, click, creative</td><td>2,410,000</td><td>Every 4 hours</td><td><span class="status-pill off">Planned</span></td></tr>
+          <tr><td>SCB Easy</td><td>Campaign feed: impression, channel, click, creative</td><td>3,120,500</td><td>Every 4 hours</td><td><span class="status-pill off">Planned</span></td></tr>
+          <tr><td>Core banking transactions</td><td>Product holding, activity recency and frequency, AUM tier</td><td>8,760,000</td><td>Daily</td><td><span class="status-pill off">Planned</span></td></tr>
+          <tr><td>CRM / demographics</td><td>Age band, income tier, relationship tier, tenure</td><td>1,180,000</td><td>Daily</td><td><span class="status-pill off">Planned</span></td></tr>
+          <tr><td>External market enrichment</td><td>Industry benchmark data</td><td>&mdash;</td><td>Not scheduled</td><td><span class="status-pill off">Not enabled</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -1447,7 +1456,7 @@
         <div class="legend" id="quadLegend"></div>
       </div>
       <div class="panel-sub">Bubble size = current liquid balance · click a customer to view details</div>
-      <svg id="quadSvg" width="100%" height="380" viewBox="0 0 760 380"></svg>
+      <svg id="quadSvg" width="100%" viewBox="0 0 760 450"></svg>
     </div>
 
     <div class="panel">
@@ -1470,6 +1479,7 @@
       <div id="trendContent">
         <svg id="trendSvg" width="100%" height="230" viewBox="0 0 680 230"></svg>
       </div>
+      <div class="trend-summary" id="trendSummary"></div>
     </div>
 
     <div class="panel">
@@ -1578,7 +1588,10 @@ function mulberry32(seed){
 /* ============================================================
    REFERENCE DATA
 ============================================================ */
-const ALL_PRODUCTS = ['Savings','Current account','Term deposits','Investments','Insurance','Lending'];
+const ALL_PRODUCTS = ['Savings','Current account','Term deposits','Mutual funds','Bonds & structured notes','Insurance','Lending'];
+const INVEST_PRODUCTS = ['Mutual funds','Bonds & structured notes'];
+const PRODUCT_LABEL = { 'Lending':'Lending (home / personal loan)' };
+const hasInvestment = c => c.held.some(p=>INVEST_PRODUCTS.includes(p));
 const STATUSES = ['Identified','Assigned','Accepted','Contacted','Meeting scheduled','Offer presented','Invested','Follow-up required','Not interested'];
 const FUNNEL_STAGES = ['Identified','Assigned','Contacted','Meeting scheduled','Offer presented','Invested'];
 const STATUS_RANK = {'Identified':0,'Assigned':1,'Accepted':1,'Contacted':2,'Not interested':2,'Meeting scheduled':3,'Follow-up required':3,'Offer presented':4,'Invested':5};
@@ -1592,9 +1605,9 @@ const RMS = [
 const CURRENT_RM_ID = 'rm2';
 
 const COHORT_BENCHMARKS = {
-  investRatio:      { label:'Deposit-to-investment ratio', unit:'%', min:45, max:80, median:62, domainMax:100, fmt:v=>Math.round(v)+'%' },
+  investRatio:      { label:'Share of balance held in investments', unit:'%', min:45, max:80, median:62, domainMax:100, fmt:v=>Math.round(v)+'%' },
   liquidBalance:     { label:'Average liquid balance', unit:'THB', min:2000000, max:9000000, median:5200000, domainMax:13000000, fmt:v=>fmtTHBShort(v) },
-  transferIntensity: { label:'External-transfer intensity', unit:'idx', min:5, max:35, median:18, domainMax:60, fmt:v=>Math.round(v)+' idx', invert:true },
+  transferIntensity: { label:'Money moved to other institutions (12M, % of balance)', unit:'%', min:1, max:9, median:4, domainMax:50, fmt:v=>Math.round(v)+'%', invert:true },
   productPenetration:{ label:'Product penetration', unit:'%', min:50, max:83, median:67, domainMax:100, fmt:v=>Math.round(v)+'%' },
   digitalEngagement: { label:'Digital engagement score', unit:'', min:55, max:90, median:71, domainMax:100, fmt:v=>Math.round(v) },
   rmInteractions:    { label:'RM interactions (12m)', unit:'', min:3, max:9, median:5, domainMax:12, fmt:v=>Math.round(v)+'x' },
@@ -1636,7 +1649,7 @@ const RAW_CUSTOMERS = [
 
   { id:'CUST-1150', name:'Chaiwat R.', segment:'Emerging Affluent', branch:'Bangkok – Sukhumvit', rmId:'rm2', eligible:true,
     likelihood:41, liquidBalance:850000, opportunityAUM:420000, trigger:'Recent RM engagement',
-    status:'Invested', lastContactDays:60, held:['Savings','Current account','Investments'], excluded:[],
+    status:'Invested', lastContactDays:60, held:['Savings','Current account','Mutual funds'], excluded:[],
     investRatio:58, transferIntensity:8, digitalEngagement:81, rmInteractions:7, existingCRMReco:null,
     tenure:'2 yrs', risk:'Growth', crmSegNote:'Age 27–33 · Bangkok metro' },
 
@@ -1648,7 +1661,7 @@ const RAW_CUSTOMERS = [
 
   { id:'CUST-1181', name:'Prasit W.', segment:'Private Wealth', branch:'Phuket', rmId:'rm4', eligible:true,
     likelihood:76, liquidBalance:12400000, opportunityAUM:8900000, trigger:'Significant cash inflow',
-    status:'Accepted', lastContactDays:30, held:['Savings','Current account','Term deposits','Investments'], excluded:[],
+    status:'Accepted', lastContactDays:30, held:['Savings','Current account','Term deposits'], excluded:[],
     investRatio:44, transferIntensity:15, digitalEngagement:73, rmInteractions:4, existingCRMReco:'Salesforce: "Liquidity event — asset consolidation"',
     tenure:'17 yrs', risk:'Moderate', crmSegNote:'Age 58–65 · Resort province' },
 
@@ -1672,13 +1685,88 @@ const RAW_CUSTOMERS = [
 
   { id:'CUST-1233', name:'Malee V.', segment:'Wealth Signature', branch:'Phuket', rmId:null, eligible:false,
     eligibilityReason:'KYC review pending — not eligible for investment offers', likelihood:70, liquidBalance:5400000, opportunityAUM:3600000,
-    trigger:'Significant cash inflow', status:'Identified', lastContactDays:null, held:['Savings','Current account'], excluded:['Investments','Insurance'],
+    trigger:'Significant cash inflow', status:'Identified', lastContactDays:null, held:['Savings','Current account'], excluded:['Mutual funds','Bonds & structured notes','Insurance'],
     investRatio:9, transferIntensity:20, digitalEngagement:55, rmInteractions:0, existingCRMReco:null,
     tenure:'2 yrs', risk:'Unassessed', crmSegNote:'Age 33–39 · Resort province' },
 ];
 
+
+/* hand-authored customers: realistic investment share (non-wealth customers hold ~no investments) and % of balance moved out (12M) */
+const FIX = {
+ 'CUST-1042':{inv:10,out:6}, 'CUST-1077':{inv:8,out:41}, 'CUST-1103':{inv:6,out:5}, 'CUST-1118':{inv:9,out:7},
+ 'CUST-1129':{inv:12,out:9}, 'CUST-1150':{inv:58,out:4}, 'CUST-1163':{inv:10,out:33}, 'CUST-1181':{inv:14,out:10},
+ 'CUST-1196':{inv:3,out:3}, 'CUST-1204':{inv:7,out:6}, 'CUST-1215':{inv:5,out:5}, 'CUST-1233':{inv:0,out:12}
+};
+RAW_CUSTOMERS.forEach(c=>{ const f=FIX[c.id]; c.investRatio=f.inv; c.transferIntensity=f.out; });
+
+/* additional synthetic customers (deterministic) so the quadrant, table and funnel read like a real book */
+(function generateCustomers(){
+  const rnd = mulberry32(20261017);
+  const pick = a => a[Math.floor(rnd()*a.length)];
+  const between = (lo,hi) => lo + rnd()*(hi-lo);
+  const wpick = items => { let r=rnd()*items.reduce((s,i)=>s+i.w,0); for(const i of items){ r-=i.w; if(r<=0) return i; } return items[items.length-1]; };
+  const FIRST = ['Somying','Nipon','Pimchanok','Anucha','Kanya','Thanawat','Supaporn','Wichai','Orawan','Pichit','Jiraporn','Surasak','Napat','Pranee','Weerasak','Kanokwan','Sakda','Rattana','Boonsri','Chalerm','Dararat','Ekachai','Fahsai','Gamon','Hathai','Issara','Jirawat','Kritsana','Lalita','Manee','Narong','Orapin','Panya','Ratree','Sompong','Tippawan','Udom','Vimol','Wanchai','Yupin','Arunee','Bancha','Charoen','Dusit','Ladda','Montri','Nattaya','Pakorn','Rungnapa','Sirichai','Thitiporn','Uthai','Varunee','Withaya','Apinya','Benjamas','Chanin','Duangjai','Kasem','Laddawan','Metta','Nuttapong','Oranuch','Pongsak','Rawee','Saowalak','Tanapon','Ubol','Visit','Wipawee','Yongyut','Achara','Boonmee','Chatree','Jaruwan'];
+  const INIT = 'ABCDEFGHJKLMNPRSTVW'.split('');
+  const SEGS = [
+    {name:'Emerging Affluent', w:.34, liq:[450000,2400000]},
+    {name:'Priority Banking',  w:.36, liq:[1500000,5200000]},
+    {name:'Wealth Signature',  w:.20, liq:[3800000,9800000]},
+    {name:'Private Wealth',    w:.10, liq:[8000000,12800000]},
+  ];
+  const TRIG = [
+    {t:'Persistent external transfers', w:.27, lk:[52,90], out:[26,46]},
+    {t:'TD', w:.20, lk:[55,92], out:[3,12]},
+    {t:'Significant cash inflow', w:.20, lk:[48,88], out:[3,12]},
+    {t:'Rising idle balance', w:.20, lk:[28,72], out:[2,10]},
+    {t:'Recent RM engagement', w:.13, lk:[25,68], out:[2,9]},
+  ];
+  const STAT = [
+    {s:'Identified',w:.22},{s:'Assigned',w:.20},{s:'Accepted',w:.08},{s:'Contacted',w:.14},{s:'Meeting scheduled',w:.09},
+    {s:'Offer presented',w:.06},{s:'Follow-up required',w:.07},{s:'Invested',w:.08},{s:'Not interested',w:.06}
+  ];
+  const RISK = ['Conservative','Balanced','Moderate','Growth'];
+  const INEL = ['Regulatory hold — do-not-contact flag on file','KYC review pending — not eligible for investment offers','Open complaint — contact suspended'];
+  const CRM = ['Salesforce: "Review liquidity allocation"','Salesforce: "Cross-sell: balanced fund"','Salesforce: "Insurance renewal upsell"','Salesforce: "TD reinvestment — income fund"'];
+  const used = new Set(RAW_CUSTOMERS.map(c=>c.name));
+  const names = FIRST.slice().sort(()=>rnd()-0.5);
+  const N = 70;
+  for(let i=0;i<N;i++){
+    let name; do { name = names[i % names.length] + ' ' + pick(INIT) + '.'; } while(used.has(name)); used.add(name);
+    const seg = wpick(SEGS), trg = wpick(TRIG);
+    const liquid = Math.round(between(seg.liq[0],seg.liq[1])/10000)*10000;
+    const opp = Math.round(liquid*between(.5,.78)/10000)*10000;
+    const rm = pick(RMS);
+    const eligible = rnd() > .08;
+    let status = eligible ? wpick(STAT).s : 'Identified';
+    let trigger = trg.t==='TD' ? 'Term deposit maturing in '+pick([7,14,21,30])+' days' : trg.t;
+    const invested = status==='Invested';
+    const held = ['Savings'];
+    if(rnd()<.85) held.push('Current account');
+    if(trg.t==='TD' || rnd()<.22) held.push('Term deposits');
+    if(rnd()<.18) held.push('Insurance');
+    if(invested) held.push(pick(INVEST_PRODUCTS));
+    const excluded = (rnd()<.12) ? ['Lending'] : [];
+    const contactless = ['Identified'].includes(status) || (status==='Assigned' && rnd()<.5);
+    const age = 26 + Math.floor(rnd()*34);
+    RAW_CUSTOMERS.push({
+      id:'CUST-'+(2001+i*3+Math.floor(rnd()*3)), name, segment:seg.name,
+      branch: rnd()<.7 ? rm.branch : pick(RMS).branch, rmId: eligible ? rm.id : null, eligible,
+      eligibilityReason: eligible ? undefined : pick(INEL),
+      likelihood: Math.round(between(trg.lk[0],trg.lk[1])), liquidBalance: liquid, opportunityAUM: opp,
+      trigger, status, lastContactDays: contactless ? null : Math.round(between(2,150)),
+      held, excluded, investRatio: invested ? Math.round(between(35,60)) : Math.round(between(0,14)),
+      transferIntensity: Math.round(between(trg.out[0],trg.out[1])),
+      digitalEngagement: Math.round(between(35,90)), rmInteractions: Math.round(between(0,8)),
+      existingCRMReco: rnd()<.15 ? pick(CRM) : null,
+      tenure: Math.max(1,Math.round(between(1,18)))+' yrs', risk: pick(RISK),
+      crmSegNote:'Age '+age+'–'+(age+6)+' · '+(rnd()<.6?'Bangkok metro':'Upcountry')
+    });
+  }
+})();
+
 // derive gap products + score + tier
 const MAX_AUM_FOR_SCORE = 9000000;
+const CLOSED_STATUSES = ['Invested','Not interested'];
 RAW_CUSTOMERS.forEach(c=>{
   c.gap = ALL_PRODUCTS.filter(p=> !c.held.includes(p) && !c.excluded.includes(p));
   const scoreRaw = c.likelihood*0.5 + Math.min(100,(c.opportunityAUM/MAX_AUM_FOR_SCORE*100))*0.5;
@@ -1762,21 +1850,22 @@ function scopedCustomers(){
   }
   return RAW_CUSTOMERS.slice();
 }
-function filteredCustomers(){
+function filteredCustomers(eligOverride){
   const f = state.filters;
+  const elig = eligOverride || f.eligibility;
   let list = scopedCustomers();
   const anyRestricted = list.some(c=>!c.eligible);
-  document.getElementById('restrictedNote').classList.toggle('show', anyRestricted && f.eligibility==='all');
+  if(!eligOverride) document.getElementById('restrictedNote').classList.toggle('show', anyRestricted && f.eligibility==='all');
 
-  if(f.eligibility==='eligible') list = list.filter(c=>c.eligible);
+  if(elig==='eligible') list = list.filter(c=>c.eligible);
   if(f.customerIds.length) list = list.filter(c=> f.customerIds.includes(c.id));
   if(f.customerNames.length) list = list.filter(c=> f.customerNames.includes(c.name));
   if(f.branch!=='all') list = list.filter(c=>c.branch===f.branch);
   if(f.segment!=='all') list = list.filter(c=>c.segment===f.segment);
   if(f.rm!=='all') list = list.filter(c=>c.rmId===f.rm);
   if(f.tier!=='all') list = list.filter(c=>c.tier===f.tier);
-  if(f.invest==='has') list = list.filter(c=>c.held.includes('Investments'));
-  if(f.invest==='none') list = list.filter(c=>!c.held.includes('Investments'));
+  if(f.invest==='has') list = list.filter(c=>hasInvestment(c));
+  if(f.invest==='none') list = list.filter(c=>!hasInvestment(c));
   if(f.lastContact!=='all') list = list.filter(c=> lastContactBucket(c.lastContactDays)===f.lastContact);
   if(f.status!=='all') list = list.filter(c=>c.status===f.status);
   return list;
@@ -1785,6 +1874,7 @@ function sortedList(list){
   const {sortKey, sortDir} = state;
   const dir = sortDir==='asc' ? 1 : -1;
   return list.slice().sort((a,b)=>{
+    if(state.sortKey==='score'){ const ca=CLOSED_STATUSES.includes(a.status)?1:0, cb=CLOSED_STATUSES.includes(b.status)?1:0; if(ca!==cb) return ca-cb; }
     let av, bv;
     if(sortKey==='rank'){ av=a.score; bv=b.score; }
     else if(sortKey==='rmId'){ av=rmName(a.rmId); bv=rmName(b.rmId); }
@@ -1803,13 +1893,16 @@ function sortedList(list){
 ============================================================ */
 function renderKPIs(list){
   const eligibleList = list.filter(c=>c.eligible);
-  const totalLiquid = eligibleList.reduce((s,c)=>s+c.liquidBalance,0);
-  const totalOpp = eligibleList.reduce((s,c)=>s+c.opportunityAUM,0);
-  const highCount = eligibleList.filter(c=>c.tier==='High').length;
+  const openList = eligibleList.filter(c=>!CLOSED_STATUSES.includes(c.status));
+  const closedN = eligibleList.length - openList.length;
+  const restrictedN = filteredCustomers('all').filter(c=>!c.eligible).length;
+  const totalLiquid = openList.reduce((s,c)=>s+c.liquidBalance,0);
+  const totalOpp = openList.reduce((s,c)=>s+c.opportunityAUM,0);
+  const highCount = openList.filter(c=>c.tier==='High').length;
 
   const kpis = [
-    { lbl:'Eligible opportunity customers', val: eligibleList.length, sub:(list.length-eligibleList.length)+' excluded (restricted)', tip:'Customers who are contact-eligible and match the current filters. Restricted or non-contactable customers are excluded by design.' },
-    { lbl:'Current liquid balances', val: fmtTHBShort(totalLiquid), sub:'Sum across eligible customers', tip:'Total current deposit/savings balances held by eligible customers today, based on account data.' },
+    { lbl:'Open opportunity customers', val: openList.length, sub:'Contact-eligible, not yet invested', tip:'Contact-eligible customers with an open opportunity that match the current filters. Customers already invested or not interested ('+closedN+' here), and restricted / non-contactable customers (do-not-contact, KYC hold; '+restrictedN+' here), are excluded from these totals by design. Illustrative data.' },
+    { lbl:'Current liquid balances', val: fmtTHBShort(totalLiquid), sub:'Sum across open opportunities', tip:'Total current deposit/savings balances held by eligible customers today, based on account data.' },
     { lbl:'Estimated opportunity AUM', val: fmtTHBShort(totalOpp), sub:'Analytical estimate — not confirmed assets', tip:'A modelled estimate of investable assets that could plausibly move to SCB. This is an analytical estimate, not a confirmed customer asset figure.' },
     { lbl:'High-priority customers', val: highCount, sub:'Tier: High (score ≥ 70)', tip:'Customers whose Activation Opportunity Score places them in the High tier, based on likelihood and estimated opportunity size.' },
   ];
@@ -1825,10 +1918,10 @@ function renderKPIs(list){
    RENDER: QUADRANT
 ============================================================ */
 const PAD = {l:46,r:20,t:16,b:36};
-const QW=760, QH=380;
+const QW=760, QH=450;
 function qx(l){ return PAD.l + (l/100)*(QW-PAD.l-PAD.r); }
-function qy(aum){ const maxA=10000000; return QH-PAD.b - (Math.min(aum,maxA)/maxA)*(QH-PAD.t-PAD.b); }
-function qr(bal){ const maxB=13000000; return 6 + Math.sqrt(Math.min(bal,maxB)/maxB)*20; }
+function qy(aum){ const maxA=12000000; return QH-PAD.b - (Math.min(aum,maxA)/maxA)*(QH-PAD.t-PAD.b); }
+function qr(bal){ const maxB=13000000; return 4 + Math.sqrt(Math.min(bal,maxB)/maxB)*12; }
 function tierFill(t){ return t==='High' ? '#0E7C5A' : t==='Medium' ? '#C9902E' : '#8A958D'; }
 
 function renderQuadrant(list){
@@ -1845,10 +1938,10 @@ function renderQuadrant(list){
   s += `<text x="14" y="${QH/2}" text-anchor="middle" class="quad-label" transform="rotate(-90 14 ${QH/2})">Estimated opportunity AUM →</text>`;
   s += `<text x="${QW-PAD.r-4}" y="${PAD.t+14}" text-anchor="end" class="quad-prioritise">High propensity / High opportunity — Prioritise</text>`;
 
-  list.filter(c=>c.eligible).forEach(c=>{
+  list.filter(c=>c.eligible && !CLOSED_STATUSES.includes(c.status)).forEach(c=>{
     const cx=qx(c.likelihood), cy=qy(c.opportunityAUM), r=qr(c.liquidBalance);
     const sel = c.id===state.selectedId ? ' selected':'';
-    s += `<circle class="bubble${sel}" data-id="${c.id}" cx="${cx}" cy="${cy}" r="${r}" fill="${tierFill(c.tier)}" fill-opacity="0.72" stroke="${tierFill(c.tier)}" stroke-width="1"/>`;
+    s += `<circle class="bubble${sel}" data-id="${c.id}" cx="${cx}" cy="${cy}" r="${r}" fill="${tierFill(c.tier)}" fill-opacity="0.62" stroke="${tierFill(c.tier)}" stroke-width="1"/>`;
   });
   svg.innerHTML = s;
 
@@ -1884,79 +1977,97 @@ const seriesCache = {};
 function getSeries(c){
   if(seriesCache[c.id]) return seriesCache[c.id];
   const rnd = mulberry32(hashStr(c.id));
-  const n=36;
-  let deposits=[], invest=[], outflow=[];
-  let dep = c.liquidBalance*0.55, inv = c.liquidBalance*(c.investRatio/100), out=0;
-  const depDrift = c.trigger.includes('idle balance') ? 0.012 : 0.002;
-  const outDrift = c.trigger.includes('external transfers') ? 0.05 : 0.008;
-  for(let i=0;i<n;i++){
-    dep = dep*(1+depDrift+(rnd()-0.5)*0.02);
-    inv = inv*(1+0.004+(rnd()-0.5)*0.015);
-    out = Math.max(0, out*(1+outDrift) + rnd()*15000);
-    deposits.push(Math.round(dep));
-    invest.push(Math.round(inv));
-    outflow.push(Math.round(out));
-  }
+  const n=36, L=c.liquidBalance;
+  const isTransfer = c.trigger.includes('external transfers');
+  const out12 = L*(c.transferIntensity/100);          // money moved to other institutions over the last 12 months
+  const startM = isTransfer ? n-10 : n-12;
+  const out = new Array(n).fill(0);
+  for(let i=0;i<n;i++){ out[i] = (i<startM) ? L*0.0015*rnd() : 0; }
+  let wsum=0; const w=[];
+  for(let i=startM;i<n;i++){ const wi = isTransfer ? (1 + (i-startM)*0.16 + rnd()*0.5) : (0.3+rnd()); w.push(wi); wsum+=wi; }
+  for(let i=startM;i<n;i++){ out[i] = out12 * w[i-startM]/wsum; }
+  const inflow = new Array(n).fill(0);
+  const idle = c.trigger.includes('idle balance'), cash = c.trigger.includes('cash inflow');
+  for(let i=0;i<n;i++){ inflow[i] = L*(idle ? 0.011*(0.5+rnd()) : 0.003*rnd()); }
+  if(cash) inflow[n-6] += L*0.36;
+  if(isTransfer){ for(let i=startM;i<n;i++) inflow[i] += out[i]*0.35; }   // some salary-type credits still arrive
+  const deposits = new Array(n);
+  deposits[n-1] = L;
+  for(let i=n-1;i>=1;i--){ deposits[i-1] = deposits[i] + out[i] - inflow[i]; }
+  const invested = c.held.some(p=>INVEST_PRODUCTS.includes(p));
+  const invest = new Array(n).fill(0).map((_,i)=> invested ? Math.round(L*(c.investRatio/(100-c.investRatio))*(0.82+0.18*i/(n-1))) : 0);
   const events=[];
-  if(c.trigger.includes('Term deposit')) events.push({m:n-3, label:'Term deposit maturity'});
-  if(c.trigger.includes('cash inflow')) events.push({m:n-6, label:'Significant cash inflow'});
-  if(c.trigger.includes('external transfers')) events.push({m:n-10, label:'Persistent external transfers'});
-  if(c.trigger.includes('idle balance')) events.push({m:n-4, label:'Rising idle balance'});
-  if(c.trigger.includes('RM engagement')) events.push({m:n-1, label:'Recent RM engagement'});
-  seriesCache[c.id] = {deposits, invest, outflow, events};
+  if(isTransfer) events.push({m:startM, label:'Transfers out begin'});
+  else if(c.trigger.includes('Term deposit')) events.push({m:n-1, label:c.trigger.replace('Term deposit maturing','TD matures')});
+  else if(cash) events.push({m:n-6, label:'Large cash inflow'});
+  else if(idle) events.push({m:n-4, label:'Idle balance building'});
+  else if(c.trigger.includes('RM engagement')) events.push({m:n-1, label:'Recent RM contact'});
+  seriesCache[c.id] = {deposits:deposits.map(Math.round), invest, outflow:out, events, invested};
   return seriesCache[c.id];
 }
-const TW=680, TH=230, TPAD={l:52,r:16,t:16,b:30};
+const TW=680, TH=230, TPAD={l:46,r:16,t:16,b:30};
 function renderTrend(c){
   const emptyEl = document.getElementById('trendEmpty');
   const contentEl = document.getElementById('trendContent');
+  const sumEl = document.getElementById('trendSummary');
   if(!c){
     document.getElementById('behaviourCustLbl').textContent = '';
     document.getElementById('trendLegend').innerHTML = '';
     emptyEl.innerHTML = `<span class="ic">◔</span>Select a customer from the quadrant or table below to view their balance and transfer trend.`;
     emptyEl.style.display='flex';
     contentEl.style.display='none';
+    sumEl.innerHTML='';
     return;
   }
   emptyEl.style.display='none';
   contentEl.style.display='block';
   document.getElementById('behaviourCustLbl').textContent = '— '+c.name+' ('+c.id+')';
-  const {deposits, invest, outflow, events} = getSeries(c);
+  const {deposits, invest, outflow, events, invested} = getSeries(c);
   const period = state.trendPeriod;
   const slice = arr => arr.slice(arr.length-period);
-  const d=slice(deposits), iv=slice(invest), of=slice(outflow);
-  const all = d.concat(iv).concat(of);
-  const maxV = Math.max(...all, 1);
+  const d=slice(deposits), iv=slice(invest);
+  let acc=0; const cum = slice(outflow).map(v=>{ acc+=v; return acc; });
+  const maxV = Math.max(...d, ...cum, ...(invested?iv:[0]), 1);
   const n=d.length;
   const xS = i => TPAD.l + (i/(n-1))*(TW-TPAD.l-TPAD.r);
-  const yS = v => TH-TPAD.b - (v/maxV)*(TH-TPAD.t-TPAD.b);
+  const yS = v => TH-TPAD.b - (v/maxV)*(TH-TPAD.t-TPAD.b-38);   // headroom keeps the event label band clear
   const path = arr => arr.map((v,i)=> (i===0?'M':'L')+xS(i).toFixed(1)+','+yS(v).toFixed(1)).join(' ');
 
   let s = `<rect x="0" y="0" width="${TW}" height="${TH}" fill="#FCFDFC"/>`;
+  [0.5,1].forEach(f=>{ const y=yS(maxV*f); s += `<line x1="${TPAD.l}" y1="${y}" x2="${TW-TPAD.r}" y2="${y}" stroke="#EEF1EF"/><text x="${TPAD.l-6}" y="${y+3}" text-anchor="end" class="quad-label">${fmtTHBShort(maxV*f).replace('THB ','')}</text>`; });
   s += `<line x1="${TPAD.l}" y1="${TH-TPAD.b}" x2="${TW-TPAD.r}" y2="${TH-TPAD.b}" stroke="#C7D1CA"/>`;
   s += `<line x1="${TPAD.l}" y1="${TPAD.t}" x2="${TPAD.l}" y2="${TH-TPAD.b}" stroke="#C7D1CA"/>`;
-  s += `<text x="4" y="${TPAD.t+8}" class="quad-label">${fmtTHBShort(maxV)}</text>`;
-  s += `<text x="4" y="${TH-TPAD.b}" class="quad-label">0</text>`;
-  s += `<path d="${path(d)}" fill="none" stroke="#0E7C5A" stroke-width="2"/>`;
-  s += `<path d="${path(iv)}" fill="none" stroke="#2E6E8A" stroke-width="2"/>`;
-  s += `<path d="${path(of)}" fill="none" stroke="#B8720F" stroke-width="2" stroke-dasharray="4,3"/>`;
+  s += `<text x="${TPAD.l-6}" y="${TH-TPAD.b+3}" text-anchor="end" class="quad-label">0</text>`;
+  s += `<text x="${TPAD.l}" y="${TH-8}" class="quad-label">${period} months ago</text><text x="${TW-TPAD.r}" y="${TH-8}" text-anchor="end" class="quad-label">Today</text>`;
+  s += `<path d="${path(d)}" fill="none" stroke="#0E7C5A" stroke-width="2.5"/>`;
+  if(invested) s += `<path d="${path(iv)}" fill="none" stroke="#2E6E8A" stroke-width="2"/>`;
+  s += `<path d="${path(cum)}" fill="none" stroke="#B8720F" stroke-width="2.5"/>`;
+  const lastOut = cum[cum.length-1];
+  const outNearDeposits = Math.abs(yS(lastOut)-yS(d[n-1])) < 18;
+  s += `<text x="${TW-TPAD.r-4}" y="${outNearDeposits ? yS(lastOut)+14 : yS(lastOut)-7}" text-anchor="end" class="quad-label" style="fill:#B8720F;font-weight:700;">${fmtTHBShort(lastOut)} moved out</text>`;
+  s += `<text x="${TW-TPAD.r-4}" y="${yS(d[n-1])-7}" text-anchor="end" class="quad-label" style="fill:#0E7C5A;font-weight:700;">${fmtTHBShort(d[n-1])} at SCB</text>`;
 
   const startIdx = 36-period;
   events.filter(e=>e.m>=startIdx).forEach(e=>{
     const idx = e.m-startIdx;
     if(idx<0||idx>=n) return;
     const x=xS(idx);
-    s += `<line x1="${x}" y1="${TPAD.t}" x2="${x}" y2="${TH-TPAD.b}" stroke="#A23B2E" stroke-width="1" stroke-dasharray="2,3" opacity="0.55"/>`;
-    s += `<circle cx="${x}" cy="${TPAD.t+4}" r="3" fill="#A23B2E"/>`;
+    s += `<line x1="${x}" y1="${TPAD.t+10}" x2="${x}" y2="${TH-TPAD.b}" stroke="#A23B2E" stroke-width="1" stroke-dasharray="2,3" opacity="0.6"/>`;
+    s += `<circle cx="${x}" cy="${TPAD.t+10}" r="3.5" fill="#A23B2E"/>`;
+    const right = x > TW-190;
+    s += `<text x="${right?x-7:x+7}" y="${TPAD.t+13}" text-anchor="${right?'end':'start'}" class="quad-label" style="fill:#A23B2E;font-weight:700;">${e.label}</text>`;
   });
   document.getElementById('trendSvg').innerHTML = s;
 
   document.getElementById('trendLegend').innerHTML = `
-    <div class="item"><span class="swatch" style="background:#0E7C5A"></span>Deposits &amp; savings</div>
-    <div class="item"><span class="swatch" style="background:#2E6E8A"></span>Investment balance</div>
-    <div class="item"><span class="swatch" style="background:#B8720F"></span>External outflows</div>
-    <div class="item"><span class="swatch" style="background:#A23B2E;border-radius:50%;width:8px;height:8px;"></span>Trigger event</div>
+    <div class="item"><span class="swatch" style="background:#0E7C5A"></span>Deposits &amp; savings at SCB</div>
+    ${invested ? '<div class="item"><span class="swatch" style="background:#2E6E8A"></span>Investment balance</div>' : ''}
+    <div class="item"><span class="swatch" style="background:#B8720F"></span>Cumulative money moved to other institutions</div>
+    <div class="item"><span class="swatch" style="background:#A23B2E;border-radius:50%;width:8px;height:8px;"></span>Trigger event (the signal that flagged this customer)</div>
   `;
+  const outPct = Math.round(lastOut/c.liquidBalance*100);
+  const depChange = d[n-1]-d[0];
+  sumEl.innerHTML = `<b>${fmtTHBShort(lastOut)}</b> moved to other institutions in ${period}M (${outPct}% of current balance) · deposits at SCB ${depChange>=0?'up':'down'} <b>${fmtTHBShort(Math.abs(depChange))}</b>${invested?'':' · no investment product held'}`;
 }
 
 /* ============================================================
@@ -1971,7 +2082,7 @@ function renderProducts(c){
     else if(c.held.includes(p)){ cls='held'; label='Held'; }
     else { cls='gap'; label='Opportunity'; }
     return `<div class="prod-row">
-      <div class="prod-name">${p}</div>
+      <div class="prod-name">${PRODUCT_LABEL[p]||p}</div>
       <div class="prod-track"><div class="prod-fill ${cls}"></div></div>
       <div class="prod-status ${cls}">${label}</div>
     </div>`;
@@ -2017,9 +2128,9 @@ function renderCohort(c){
 function reasonsFor(c){
   const r=[];
   r.push(`Trigger detected: ${c.trigger}.`);
-  if(c.investRatio < COHORT_BENCHMARKS.investRatio.median) r.push(`Deposit-to-investment ratio (${c.investRatio}%) is below the successful-cohort median (${COHORT_BENCHMARKS.investRatio.median}%), indicating unallocated liquidity.`);
-  if(c.opportunityAUM > 2000000) r.push(`Estimated opportunity AUM of ${fmtTHBShort(c.opportunityAUM)} places this customer in a high-value segment.`);
-  if(c.transferIntensity > COHORT_BENCHMARKS.transferIntensity.median) r.push(`External-transfer intensity is above the cohort median, a possible sign of assets held elsewhere.`);
+  if(c.investRatio < COHORT_BENCHMARKS.investRatio.median) r.push(`Only ${c.investRatio}% of the balance is held in investments, against a successful-cohort median of ${COHORT_BENCHMARKS.investRatio.median}% — indicating unallocated liquidity.`);
+  if(c.opportunityAUM > 2000000) r.push(`Estimated opportunity AUM of ${fmtTHBShort(c.opportunityAUM)} — about ${Math.round(c.opportunityAUM/c.liquidBalance*100)}% of the liquid balance is estimated to be investable (illustrative).`);
+  if(c.transferIntensity > COHORT_BENCHMARKS.transferIntensity.median) r.push(`Moved about ${fmtTHBShort(c.liquidBalance*c.transferIntensity/100)} (${c.transferIntensity}% of balance) to other institutions in the last 12 months, against a cohort median of ${COHORT_BENCHMARKS.transferIntensity.median}% — a likely sign of assets held elsewhere.`);
   return r;
 }
 function signalsFor(c){
@@ -2088,28 +2199,7 @@ function renderPriorityPanel(c){
       </div>
     </details>
 
-    <div class="callout">
-      <div class="head">⚠ Decision logic to be discussed with SCB</div>
-      <div style="font-size:11.5px; color:var(--text-dim);">This wireframe does not assume AI is the selected approach. Possible approaches:</div>
-      <div class="approach-pills">
-        <span>Business-rule-based prioritisation</span>
-        <span>AI / ML propensity &amp; opportunity models</span>
-        <span>Hybrid: regulatory + business rules + AI/ML</span>
-        <span>Reuse / enhance existing CRM (Salesforce) recommendations</span>
-      </div>
-      <details class="open-qs">
-        <summary>Open discovery questions</summary>
-        <ul>
-          <li>How is an "opportunity customer" defined?</li>
-          <li>What rules determine contact eligibility?</li>
-          <li>What outcome defines successful activation?</li>
-          <li>Which customer and behavioural data is actually available?</li>
-          <li>Should existing product recommendations be reused?</li>
-          <li>What level of explanation and governance is required?</li>
-          <li>How will model or rule performance be monitored?</li>
-        </ul>
-      </details>
-    </div>
+    <div class="score-note"><b>How the score works (illustrative)</b> Score = 50% likelihood to invest + 50% opportunity size. In production this can be business rules, a Qlik Predict model, or a hybrid, with reasons explained per customer.</div>
   `;
 }
 
@@ -2118,10 +2208,10 @@ function renderPriorityPanel(c){
 ============================================================ */
 function renderTable(list){
   const sorted = sortedList(list);
-  document.getElementById('tableCount').textContent = `Showing ${sorted.length} customer${sorted.length!==1?'s':''}`;
+  document.getElementById('tableCount').textContent = `Showing ${sorted.length} customer${sorted.length!==1?'s':''} · closed outcomes (invested / not interested) listed last`;
   document.getElementById('custTableBody').innerHTML = sorted.map((c,idx)=>{
     const selCls = c.id===state.selectedId ? ' selected':'';
-    const restrictedCls = !c.eligible ? ' restricted':'';
+    const restrictedCls = (!c.eligible ? ' restricted':'') + (CLOSED_STATUSES.includes(c.status) ? ' closed':'');
     return `<tr class="${selCls}${restrictedCls}" data-id="${c.id}">
       <td><span class="rank-pill">${idx+1}</span></td>
       <td><b>${c.id}</b><br><span style="font-size:10.5px;color:var(--text-faint);font-weight:400;">${c.name}</span></td>
@@ -2188,6 +2278,7 @@ function renderFunnel(list){
     <div class="fmeta-item"><b>${fmtTHBShort(newMoney)}</b>New money generated (illustrative)</div>
     <div class="fmeta-item"><b>${fmtTHBShort(baseline)}</b>Baseline comparison (untargeted outreach, illustrative)</div>
     <div class="fmeta-item"><b>${counts[0]?Math.round(counts[5]/counts[0]*100):0}%</b>End-to-end conversion (Identified → Invested)</div>
+    <div class="fmeta-item" style="flex-basis:100%;font-size:11px;color:var(--text-faint);">Illustrative sample of ${eligibleList.length} customers — not a conversion benchmark.</div>
   `;
 
   const rmPerfEl = document.getElementById('rmPerf');
@@ -2486,7 +2577,7 @@ function openDrawer(id){
     <div class="field"><label>Final outcome / status</label>
       <select id="dFinalStatus">${STATUSES.map(s=>`<option ${s===c.status?'selected':''}>${s}</option>`).join('')}</select>
     </div>
-    <div class="crm-note">CRM (Salesforce) remains the system of record. This action will be synced back; it does not connect to a live backend in this wireframe.</div>
+    <div class="crm-note">CRM (Salesforce) remains the system of record. This action will be synced back; it does not connect to a live backend in this prototype.</div>
   `;
 
   if(showAcceptDecline){
@@ -2635,20 +2726,28 @@ function forceSelectBar(chart, label){
 }
 
 /* ---------- Shared filter bar ---------- */
+var FILTER_FIELDS = { ov:['channel','segment','customer'], ex:['channel','segment','creative','daterange','customer'], rc:['segment'], rec:[], gov:[] };
 function filterBarHTML(prefix){
+  var fields = FILTER_FIELDS[prefix] || [];
+  if (!fields.length) return '';
+  var on = ' onchange="onFilterChange(\'' + prefix + '\')"';
+  function sel(id,label,opts){ return '<div class="filter-field"><label>' + label + '</label><select id="' + prefix + '-' + id + '"' + on + '>' + opts.map(function(o){ return '<option>' + o + '</option>'; }).join('') + '</select></div>'; }
+  var html = {
+    channel: sel('channel','Channel',['All','Push','Email','In-app']),
+    segment: sel('segment','Segment',['All','Mass','Affluent','Prime','Private']),
+    creative: sel('creative','Creative',['All','A','B','C']),
+    daterange: sel('daterange','Date range',['Last 30 days','Last 7 days','Last 90 days']),
+    customer: '<div class="filter-field grow"><label>Customer name</label><input type="text" id="' + prefix + '-customer" list="customer-options" placeholder="Search or select a customer" oninput="onFilterChange(\'' + prefix + '\')"></div>'
+  };
   return '<button type="button" class="mobile-filter-toggle" onclick="toggleMobileFilters(\'' + prefix + '\')" id="' + prefix + '-filter-toggle">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M7 12h10M10 18h4"/></svg> Filters' +
     '</button>' +
-    '<div class="filter-bar" id="' + prefix + '-filter-bar">' +
-    '<div class="filter-field"><label>Channel</label><select id="' + prefix + '-channel" onchange="onFilterChange(\'' + prefix + '\')"><option>All</option><option>Push</option><option>Email</option><option>In-app</option></select></div>' +
-    '<div class="filter-field"><label>Segment</label><select id="' + prefix + '-segment" onchange="onFilterChange(\'' + prefix + '\')"><option>All</option><option>Mass</option><option>Affluent</option><option>Prime</option><option>Private</option></select></div>' +
-    '<div class="filter-field"><label>Creative</label><select id="' + prefix + '-creative" onchange="onFilterChange(\'' + prefix + '\')"><option>All</option><option>A</option><option>B</option><option>C</option></select></div>' +
-    '<div class="filter-field"><label>Date range</label><select id="' + prefix + '-daterange" onchange="onFilterChange(\'' + prefix + '\')"><option>Last 30 days</option><option>Last 7 days</option><option>Last 90 days</option></select></div>' +
-    '<div class="filter-field grow"><label>Customer name</label><input type="text" id="' + prefix + '-customer" list="customer-options" placeholder="Search or select a customer" oninput="onFilterChange(\'' + prefix + '\')"></div>' +
+    '<div class="filter-bar" id="' + prefix + '-filter-bar">' + fields.map(function(f){ return html[f]; }).join('') +
     '<button class="filter-clear" onclick="clearFilters(\'' + prefix + '\')">Clear filters</button>' +
   '</div>' +
   '<div class="showing-chip" id="' + prefix + '-showing"></div>';
 }
+function fval(prefix,id){ var el = document.getElementById(prefix + '-' + id); return el ? el.value : ''; }
 function toggleMobileFilters(prefix){
   var bar = document.getElementById(prefix + '-filter-bar');
   var btn = document.getElementById(prefix + '-filter-toggle');
@@ -2656,70 +2755,183 @@ function toggleMobileFilters(prefix){
   btn.classList.toggle('active', open);
 }
 function updateShowingChip(prefix){
+  if (!document.getElementById(prefix + '-showing')) return;
   var parts = [];
-  var chan = document.getElementById(prefix + '-channel').value;
-  var seg = document.getElementById(prefix + '-segment').value;
-  var cre = document.getElementById(prefix + '-creative').value;
-  var dr = document.getElementById(prefix + '-daterange').value;
-  var cust = document.getElementById(prefix + '-customer').value;
+  var chan = fval(prefix,'channel') || 'All', seg = fval(prefix,'segment') || 'All', cre = fval(prefix,'creative') || 'All';
+  var dr = fval(prefix,'daterange'), cust = fval(prefix,'customer');
   if (chan !== 'All') parts.push('Channel: ' + chan);
   if (seg !== 'All') parts.push('Segment: ' + seg);
   if (cre !== 'All') parts.push('Creative: ' + cre);
-  parts.push(dr);
+  if (dr) parts.push(dr); else parts.push('Last 30 days');
   if (cust) parts.push('Customer: ' + cust);
-  document.getElementById(prefix + '-showing').textContent = 'Showing: ' + parts.join(' \u00b7 ');
+  document.getElementById(prefix + '-showing').textContent = 'Showing: ' + parts.join(' · ');
 }
 function clearFilters(prefix){
-  document.getElementById(prefix + '-channel').value = 'All';
-  document.getElementById(prefix + '-segment').value = 'All';
-  document.getElementById(prefix + '-creative').value = 'All';
-  document.getElementById(prefix + '-daterange').value = 'Last 30 days';
-  document.getElementById(prefix + '-customer').value = '';
+  ['channel','segment','creative'].forEach(function(k){ var el = document.getElementById(prefix + '-' + k); if (el) el.value = 'All'; });
+  var dr = document.getElementById(prefix + '-daterange'); if (dr) dr.value = 'Last 30 days';
+  var cu = document.getElementById(prefix + '-customer'); if (cu) cu.value = '';
   onFilterChange(prefix);
 }
 function onFilterChange(prefix){
   updateShowingChip(prefix);
   if (prefix === 'ov') applyOverviewFilters();
   if (prefix === 'rc') applyRootCauseFilters();
+  if (prefix === 'ex') applyExploreFilters();
 }
 
 /* ---------- Overview: filter-driven KPI + chart highlight ---------- */
 var SEGMENT_KPI = {
   All: { ctr: 3.4, campaigns: 4.6, conv: 0.9, suppressed: 38 },
-  Mass: { ctr: 5.9, campaigns: 3.1, conv: 1.3, suppressed: 12 },
-  Affluent: { ctr: 4.7, campaigns: 3.8, conv: 1.0, suppressed: 22 },
-  Prime: { ctr: 2.8, campaigns: 7.2, conv: 0.4, suppressed: 61 },
-  Private: { ctr: 3.5, campaigns: 4.0, conv: 0.8, suppressed: 29 }
+  Mass: { ctr: 5.0, campaigns: 3.1, conv: 1.3, suppressed: 12 },
+  Affluent: { ctr: 4.2, campaigns: 3.8, conv: 1.0, suppressed: 22 },
+  Prime: { ctr: 2.3, campaigns: 7.2, conv: 0.4, suppressed: 61 },
+  Private: { ctr: 2.9, campaigns: 4.0, conv: 0.8, suppressed: 29 }
 };
 var CHANNEL_KPI = {
   All: SEGMENT_KPI.All,
   Push: { ctr: 2.1, campaigns: 5.5, conv: 0.5, suppressed: 47 },
-  Email: { ctr: 4.8, campaigns: 3.9, conv: 1.0, suppressed: 24 },
-  'In-app': { ctr: 6.3, campaigns: 3.2, conv: 1.5, suppressed: 9 }
+  Email: { ctr: 4.2, campaigns: 3.9, conv: 1.0, suppressed: 24 },
+  'In-app': { ctr: 5.4, campaigns: 3.2, conv: 1.5, suppressed: 9 }
 };
+/* Customer-level campaign profiles (illustrative, synthetic) */
+var CA_CUSTOMERS = {
+  'Somchai Wattana':    { seg:'Prime',    chan:'Push',   freq:8.1, ctr:1.1, conv:0.2, suppressed:true,  creative:{A:1.3,B:0.9,C:1.0}, trend:[2.4,2.2,2.0,1.7,1.5,1.3,1.2,1.1] },
+  'Piyada Chaiyasit':   { seg:'Affluent', chan:'In-app', freq:2.4, ctr:6.8, conv:1.5, suppressed:false, creative:{A:6.4,B:7.1,C:6.7}, trend:[6.5,6.6,6.9,6.7,6.8,7.0,6.7,6.8] },
+  'Narissara Boonmee':  { seg:'Mass',     chan:'Email',  freq:3.1, ctr:5.2, conv:1.1, suppressed:false, creative:{A:5.4,B:4.9,C:5.3}, trend:[5.0,5.1,5.3,5.2,5.4,5.1,5.2,5.2] },
+  'Thanawat Srisuk':    { seg:'Prime',    chan:'Push',   freq:6.9, ctr:1.8, conv:0.4, suppressed:true,  creative:{A:1.9,B:1.6,C:1.8}, trend:[3.0,2.8,2.6,2.3,2.1,2.0,1.9,1.8] },
+  'Kanya Pattanakul':   { seg:'Private',  chan:'Email',  freq:4.0, ctr:3.6, conv:0.8, suppressed:false, creative:{A:3.4,B:3.9,C:3.5}, trend:[3.7,3.6,3.5,3.7,3.6,3.5,3.6,3.6] },
+  'Anucha Ratanakorn':  { seg:'Affluent', chan:'Push',   freq:5.6, ctr:2.2, conv:0.5, suppressed:true,  creative:{A:2.3,B:2.0,C:2.3}, trend:[4.0,3.7,3.3,3.0,2.7,2.5,2.3,2.2] },
+  'Suchada Wongsawat':  { seg:'Mass',     chan:'In-app', freq:2.0, ctr:7.1, conv:1.6, suppressed:false, creative:{A:6.8,B:7.4,C:7.1}, trend:[6.8,7.0,7.2,7.0,7.1,7.3,7.0,7.1] },
+  'Krit Chotirat':      { seg:'Prime',    chan:'Email',  freq:7.4, ctr:1.6, conv:0.3, suppressed:true,  creative:{A:1.7,B:1.4,C:1.6}, trend:[3.2,2.9,2.6,2.3,2.0,1.8,1.7,1.6] }
+};
+function customerOf(prefix){ var el = document.getElementById(prefix + '-customer'); return el ? (CA_CUSTOMERS[el.value.trim()] || null) : null; }
+function freqBucketLabel(f){ return f <= 2.5 ? '1-2 campaigns' : f <= 4.5 ? '3-4 campaigns' : f <= 6.5 ? '5-6 campaigns' : '7+ campaigns'; }
+var KPI_DEFAULT_DELTAS = {
+  ctr:{cls:'bad', html:'&#9660; 0.5 pts vs last month'}, campaigns:{cls:'bad', html:'&#9650; 0.8 vs last month'},
+  conv:{cls:'flat', html:'&#8212; flat vs last month'}, suppressed:{cls:'bad', html:'&#9650; 6 pts vs last month'}
+};
+function setDelta(id, cls, html){ var el = document.getElementById(id); el.className = 'kpi-delta ' + cls; el.innerHTML = html; }
 function applyOverviewFilters(){
   var seg = document.getElementById('ov-segment').value;
   var chan = document.getElementById('ov-channel').value;
-  var data, dim, val;
-  if (chan !== 'All') { data = CHANNEL_KPI[chan]; dim = 'channel'; val = chan; }
+  var cust = customerOf('ov');
+  var base = SEGMENT_KPI.All, data, dim = null, val;
+  var note = document.getElementById('ov-cust-note');
+  if (cust) { data = { ctr:cust.ctr, campaigns:cust.freq, conv:cust.conv, suppressed:null }; }
+  else if (chan !== 'All') { data = CHANNEL_KPI[chan]; dim = 'channel'; val = chan; }
   else if (seg !== 'All') { data = SEGMENT_KPI[seg]; dim = 'segment'; val = seg; }
-  else { data = SEGMENT_KPI.All; dim = null; }
+  else { data = base; }
   document.getElementById('kpi-ctr').textContent = data.ctr.toFixed(1) + '%';
   document.getElementById('kpi-campaigns').textContent = data.campaigns.toFixed(1);
   document.getElementById('kpi-conv').textContent = data.conv.toFixed(1) + '%';
-  document.getElementById('kpi-suppressed').textContent = data.suppressed + '%';
-  clearChart('segment'); clearChart('channel');
-  if (dim === 'segment') forceSelectBar('segment', val);
-  if (dim === 'channel') forceSelectBar('channel', val);
+  document.getElementById('kpi-suppressed').textContent = cust ? (cust.suppressed ? 'Yes' : 'No') : data.suppressed + '%';
+  if (cust || dim) {
+    var d = function(a,b,u){ var x = a-b; return (x>=0?'+':'') + x.toFixed(1) + u + ' vs portfolio'; };
+    setDelta('kpi-ctr-delta', data.ctr < base.ctr ? 'bad' : 'flat', d(data.ctr, base.ctr, ' pts'));
+    setDelta('kpi-campaigns-delta', data.campaigns > base.campaigns ? 'bad' : 'flat', d(data.campaigns, base.campaigns, ''));
+    setDelta('kpi-conv-delta', data.conv < base.conv ? 'bad' : 'flat', d(data.conv, base.conv, ' pts'));
+    setDelta('kpi-suppressed-delta', cust ? (cust.suppressed ? 'bad' : 'flat') : (data.suppressed > base.suppressed ? 'bad' : 'flat'),
+      cust ? (cust.suppressed ? 'contact frequency is holding clicks down' : 'contact level is healthy') : ((data.suppressed-base.suppressed>=0?'+':'') + (data.suppressed-base.suppressed) + ' pts vs portfolio'));
+  } else {
+    setDelta('kpi-ctr-delta', KPI_DEFAULT_DELTAS.ctr.cls, KPI_DEFAULT_DELTAS.ctr.html);
+    setDelta('kpi-campaigns-delta', KPI_DEFAULT_DELTAS.campaigns.cls, KPI_DEFAULT_DELTAS.campaigns.html);
+    setDelta('kpi-conv-delta', KPI_DEFAULT_DELTAS.conv.cls, KPI_DEFAULT_DELTAS.conv.html);
+    setDelta('kpi-suppressed-delta', KPI_DEFAULT_DELTAS.suppressed.cls, KPI_DEFAULT_DELTAS.suppressed.html);
+  }
+  clearChart('segment'); clearChart('channel'); clearChart('freq');
+  if (cust) {
+    forceSelectBar('segment', cust.seg); forceSelectBar('channel', cust.chan); forceSelectBar('freq', freqBucketLabel(cust.freq));
+    note.style.display = 'block';
+    note.innerHTML = '<span class="synth-badge">Customer view</span>' + document.getElementById('ov-customer').value + ' &middot; ' + cust.seg + ' &middot; most active on ' + cust.chan + ' &middot; ' + cust.freq.toFixed(1) + ' campaigns received in 30 days. The highlighted bars show where this customer sits in each chart.';
+  } else {
+    note.style.display = 'none';
+    if (dim === 'segment') forceSelectBar('segment', val);
+    if (dim === 'channel') forceSelectBar('channel', val);
+  }
+}
+
+/* ---------- Explore: filters drive the charts and the report builder ---------- */
+var TREND_BASE = [4.6,4.5,4.3,4.0,3.9,3.6,3.5,3.4];
+var CREATIVE_BASE = { A:3.8, B:3.1, C:3.6 };
+function exFilters(){
+  return { chan: fval('ex','channel') || 'All', seg: fval('ex','segment') || 'All', cre: fval('ex','creative') || 'All',
+           dr: fval('ex','daterange') || 'Last 30 days', cust: customerOf('ex'), custName: fval('ex','customer') };
+}
+function exFactor(f){ var k = 1; if (f.seg !== 'All') k *= SEGMENT_KPI[f.seg].ctr / 3.4; if (f.chan !== 'All') k *= CHANNEL_KPI[f.chan].ctr / 3.4; return k; }
+function renderTrendChart(vals, labels){
+  var min = Math.min.apply(null, vals) - 0.5, max = Math.max.apply(null, vals) + 0.5, n = vals.length;
+  var X = function(i){ return n === 1 ? 240 : 30 + i * (420 / (n - 1)); };
+  var Y = function(v){ return 140 - (v - min) / (max - min) * 100; };
+  var pts = vals.map(function(v,i){ return X(i).toFixed(1) + ',' + Y(v).toFixed(1); }).join(' ');
+  var s = '<svg viewBox="0 0 480 180" width="100%"><line x1="20" y1="150" x2="460" y2="150" stroke="#e6e2f2" stroke-width="1"/>';
+  s += '<polyline points="' + pts + '" fill="none" stroke="#4a2f8f" stroke-width="2.5"/>';
+  vals.forEach(function(v,i){ s += '<circle cx="' + X(i).toFixed(1) + '" cy="' + Y(v).toFixed(1) + '" r="4" fill="' + (i >= n-2 ? '#c0392b' : '#4a2f8f') + '"/>'; });
+  s += '<text x="' + X(0) + '" y="' + (Y(vals[0]) - 10).toFixed(1) + '" text-anchor="middle" font-size="10.5" fill="#6b6486">' + vals[0].toFixed(1) + '%</text>';
+  s += '<text x="' + X(n-1) + '" y="' + (Y(vals[n-1]) - 10).toFixed(1) + '" text-anchor="middle" font-size="10.5" font-weight="700" fill="#c0392b">' + vals[n-1].toFixed(1) + '%</text>';
+  labels.forEach(function(l,i){ s += '<text x="' + X(i).toFixed(1) + '" y="166" text-anchor="middle" font-size="10" fill="#6b6486">' + l + '</text>'; });
+  document.getElementById('ex-trend-container').innerHTML = s + '</svg>';
+}
+function renderCreativeChart(vals){
+  var max = Math.max(vals.A, vals.B, vals.C), sc = Math.min(21, 108 / max);
+  var xs = { A:35, B:117, C:199 }, s = '<svg viewBox="0 0 280 180" width="100%"><line x1="20" y1="150" x2="260" y2="150" stroke="#e6e2f2" stroke-width="1"/>';
+  ['A','B','C'].forEach(function(k){
+    var h = vals[k] * sc, y = 150 - h;
+    s += '<rect class="bar" data-chart="creative" data-label="Variant ' + k + '" onclick="selectBar(this)" x="' + xs[k] + '" y="' + y.toFixed(1) + '" width="46" height="' + h.toFixed(1) + '" rx="4" fill="#241a3d"/>';
+    s += '<text x="' + (xs[k]+23) + '" y="' + (y-7).toFixed(1) + '" text-anchor="middle" font-size="12" font-weight="700" fill="#241a3d">' + vals[k].toFixed(1) + '%</text>';
+    s += '<text x="' + (xs[k]+23) + '" y="166" text-anchor="middle" font-size="11" fill="#6b6486">' + k + '</text>';
+  });
+  document.getElementById('ex-creative-container').innerHTML = s + '</svg>';
+}
+function applyExploreFilters(){
+  var f = exFilters(), k = exFactor(f), vals;
+  vals = f.cust ? f.cust.trend.slice() : TREND_BASE.map(function(v){ return v * k; });
+  var n = f.dr === 'Last 7 days' ? 2 : (f.dr === 'Last 30 days' ? 5 : 8);
+  vals = vals.slice(-n);
+  var labels = vals.map(function(v,i){ return 'W' + (8 - n + 1 + i); });
+  renderTrendChart(vals, labels);
+  document.getElementById('ex-trend-sub').textContent = f.dr === 'Last 7 days' ? 'Weekly, last 2 weeks' : (f.dr === 'Last 30 days' ? 'Weekly, last 5 weeks' : 'Weekly, last 8 weeks');
+  var delta = vals[vals.length-1] - vals[0];
+  document.getElementById('ex-trend-foot').textContent = f.cust
+    ? (f.custName + ': CTR ' + (delta < 0 ? 'has fallen ' : 'is steady/up ') + Math.abs(delta).toFixed(1) + ' pts over this period' + (f.cust.suppressed ? ', consistent with contact-frequency fatigue' : ''))
+    : (delta < 0 ? 'CTR down ' + Math.abs(delta).toFixed(1) + ' pts over this period, coinciding with higher send frequency' : 'CTR broadly stable over this period');
+  var cv = f.cust ? f.cust.creative : { A: CREATIVE_BASE.A * k, B: CREATIVE_BASE.B * k, C: CREATIVE_BASE.C * k };
+  renderCreativeChart(cv);
+  clearChart('creative');
+  if (f.cre !== 'All') forceSelectBar('creative', 'Variant ' + f.cre);
+  var best = ['A','B','C'].sort(function(a,b){ return cv[b] - cv[a]; })[0];
+  document.getElementById('ex-creative-foot').textContent = f.cust ? ('Best-performing variant for this customer: ' + best + ' (spread is small vs. contact frequency)') : 'Variants are close — creative is not the leading driver';
+  if (document.querySelector('#builder-chart-container .result-header')) renderBuilderChart();
+}
+/* builder helpers: honour the Explore filters */
+function exCats(dim){
+  var f = exFilters(), cats = DIM_DATA[dim].categories;
+  if (f.cust) return cats;
+  var sel = dim === 'Channel' ? f.chan : dim === 'Segment' ? f.seg : dim === 'Creative' ? f.cre : 'All';
+  return sel === 'All' ? cats : cats.filter(function(c){ return c === sel; });
+}
+function exScale(dims, measure){
+  var f = exFilters(), s = 1;
+  if (f.cust) {
+    var cv = { 'CTR': f.cust.ctr, 'Conversion rate': f.cust.conv, 'Avg frequency': f.cust.freq, 'Clicks': BASELINE['Clicks'] * f.cust.ctr / 3.4, 'Suppressed reach %': f.cust.suppressed ? 74 : 12 };
+    return cv[measure] / BASELINE[measure];
+  }
+  [['Channel', f.chan], ['Segment', f.seg], ['Creative', f.cre]].forEach(function(p){
+    if (p[1] !== 'All' && dims.indexOf(p[0]) < 0) { s *= factorOf(p[0], p[1], measure); }
+  });
+  return s;
+}
+function exVals(dim, m, dims){
+  var cats = DIM_DATA[dim].categories, keep = exCats(dim), s = exScale(dims, m);
+  return cats.map(function(c,i){ return DIM_DATA[dim][m][i] * s; }).filter(function(v,i){ return keep.indexOf(cats[i]) >= 0; });
 }
 
 /* ---------- Explore: self-service builder ---------- */
 var DIM_DATA = {
   'Channel': { categories: ['Push','Email','In-app'],
-    'CTR':[2.1,4.8,6.3], 'Conversion rate':[0.5,1.0,1.5], 'Avg frequency':[5.5,3.9,3.2],
+    'CTR':[2.1,4.2,5.4], 'Conversion rate':[0.5,1.0,1.5], 'Avg frequency':[5.5,3.9,3.2],
     'Clicks':[10500,18200,21300], 'Suppressed reach %':[47,24,9] },
   'Segment': { categories: ['Mass','Affluent','Prime','Private'],
-    'CTR':[5.9,4.7,2.8,3.5], 'Conversion rate':[1.3,1.0,0.4,0.8], 'Avg frequency':[3.1,3.8,7.2,4.0],
+    'CTR':[5.0,4.2,2.3,2.9], 'Conversion rate':[1.3,1.0,0.4,0.8], 'Avg frequency':[3.1,3.8,7.2,4.0],
     'Clicks':[15600,13800,8200,10400], 'Suppressed reach %':[12,22,61,29] },
   'Frequency bucket': { categories: ['1-2','3-4','5-6','7+'],
     'CTR':[6.5,4.9,3.1,1.4], 'Conversion rate':[1.6,1.1,0.6,0.2], 'Avg frequency':[1.5,3.5,5.5,8.0],
@@ -2834,23 +3046,23 @@ function pieHTML(categories, values, measureName, donut){
 
 function getReportData(dims, measures){
   if (dims.length === 1) {
-    var dim = dims[0], cats = DIM_DATA[dim].categories;
+    var dim = dims[0], cats = exCats(dim);
     var header = [dim].concat(measures);
-    var rows = cats.map(function(cat, i){ return [cat].concat(measures.map(function(m){ return DIM_DATA[dim][m][i]; })); });
+    var series = measures.map(function(m){ return exVals(dim, m, dims); });
+    var rows = cats.map(function(cat, i){ return [cat].concat(series.map(function(s){ return s[i]; })); });
     return { header: header, rows: rows, note: '' };
   }
   var d1 = dims[0], d2 = dims[1];
-  var cats1 = DIM_DATA[d1].categories, cats2 = DIM_DATA[d2].categories;
+  var cats1 = exCats(d1), cats2 = exCats(d2);
   var header = [d1, d2].concat(measures);
   var rows = [];
   cats1.forEach(function(c1){
     cats2.forEach(function(c2){
-      rows.push([c1, c2].concat(measures.map(function(m){ return combinedValue([d1, d2], [c1, c2], m); })));
+      rows.push([c1, c2].concat(measures.map(function(m){ return combinedValue([d1, d2], [c1, c2], m) * exScale([d1, d2], m); })));
     });
   });
   return { header: header, rows: rows, note: 'Combined dimensions are modeled assuming independence between them, for illustration only.' };
 }
-
 function tableHTML(data){
   var note = data.note ? '<div class="sample-note" style="margin:0 0 12px;">' + data.note + '</div>' : '';
   var head = '<tr>' + data.header.map(function(h){ return '<th>' + h + '</th>'; }).join('') + '</tr>';
@@ -2891,7 +3103,7 @@ function renderBuilderChart(){
 
   if (selDims.length === 0 || selMeasures.length === 0) {
     outputCol.style.justifyContent = 'center';
-    container.innerHTML = '<div class="builder-empty"><div class="builder-empty-icon">&#128202;</div><div class="builder-empty-title">Configure your report above</div><div class="builder-empty-sub">Select at least one dimension and one measure, then Generate Report</div></div>';
+    container.innerHTML = '<div class="builder-empty"><div class="builder-empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#9d93c4" stroke-width="1.6" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></div><div class="builder-empty-title">Configure your report above</div><div class="builder-empty-sub">Select at least one dimension and one measure, then Generate Report</div></div>';
     return;
   }
   outputCol.style.justifyContent = 'flex-start';
@@ -2903,11 +3115,11 @@ function renderBuilderChart(){
   if (chartType === 'Table' || selDims.length > 1) {
     vizHtml = tableHTML(window.lastReportData);
   } else {
-    var dim = selDims[0], categories = DIM_DATA[dim].categories;
+    var dim = selDims[0], categories = exCats(dim);
     if (chartType === 'Pie' || chartType === 'Donut') {
-      vizHtml = pieHTML(categories, DIM_DATA[dim][selMeasures[0]], selMeasures[0], chartType === 'Donut');
+      vizHtml = pieHTML(categories, exVals(dim, selMeasures[0], [dim]), selMeasures[0], chartType === 'Donut');
     } else {
-      var seriesList = selMeasures.map(function(m){ return { name: m, values: DIM_DATA[dim][m] }; });
+      var seriesList = selMeasures.map(function(m){ return { name: m, values: exVals(dim, m, [dim]) }; });
       vizHtml = (chartType === 'Line') ? lineHTML(categories, seriesList) : barHTML(categories, seriesList, chartType === 'H-Bar');
     }
   }
@@ -2915,11 +3127,12 @@ function renderBuilderChart(){
   var title = selMeasures.join(' & ') + ' by ' + selDims.join(', ');
   var now = new Date();
   var timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  var meta = period + ' &middot; Generated ' + timeStr;
+  var ef = exFilters(); var fl = []; if (ef.cust) fl.push('Customer view: ' + ef.custName + ' (modelled)'); else { if (ef.chan !== 'All') fl.push('Channel: ' + ef.chan); if (ef.seg !== 'All') fl.push('Segment: ' + ef.seg); if (ef.cre !== 'All') fl.push('Creative: ' + ef.cre); }
+  var meta = period + (fl.length ? ' &middot; ' + fl.join(' &middot; ') : '') + ' &middot; Generated ' + timeStr;
 
   var compareNote = '';
-  if (comparison === 'WoW Growth') compareNote = '<div class="compare-note">&#128200; WoW Growth: ' + selMeasures[0] + ' up 0.3 pts vs prior week</div>';
-  else if (comparison === 'vs Target') compareNote = '<div class="compare-note">&#127919; vs Target: tracking 92% of target for ' + selMeasures[0] + '</div>';
+  if (comparison === 'WoW Growth') compareNote = '<div class="compare-note">WoW Growth: ' + selMeasures[0] + ' up 0.3 pts vs prior week</div>';
+  else if (comparison === 'vs Target') compareNote = '<div class="compare-note">vs Target: tracking 92% of target for ' + selMeasures[0] + '</div>';
 
   var header =
     '<div class="result-header">' +
@@ -2935,11 +3148,19 @@ function renderBuilderChart(){
 
 /* ---------- Root cause: filterable driver ranking ---------- */
 var DRIVER_DATA = {
-  All: [ {label:'Campaigns / 30 days', val:3.1}, {label:'Channel mismatch', val:1.6}, {label:'Segment', val:0.9}, {label:'Send-time mismatch', val:0.6}, {label:'Creative variant', val:0.3}, {label:'Tenure', val:0.2} ],
-  Mass: [ {label:'Channel mismatch', val:1.8}, {label:'Campaigns / 30 days', val:1.0}, {label:'Send-time mismatch', val:0.7}, {label:'Creative variant', val:0.4}, {label:'Tenure', val:0.3} ],
-  Affluent: [ {label:'Campaigns / 30 days', val:1.6}, {label:'Channel mismatch', val:1.3}, {label:'Send-time mismatch', val:0.6}, {label:'Creative variant', val:0.3}, {label:'Tenure', val:0.2} ],
-  Prime: [ {label:'Campaigns / 30 days', val:4.4}, {label:'Channel mismatch', val:1.1}, {label:'Send-time mismatch', val:0.5}, {label:'Creative variant', val:0.2}, {label:'Tenure', val:0.2} ],
-  Private: [ {label:'Campaigns / 30 days', val:1.9}, {label:'Channel mismatch', val:0.9}, {label:'Send-time mismatch', val:0.5}, {label:'Creative variant', val:0.3}, {label:'Tenure', val:0.2} ]
+  All: [ {label:'Messages in 30 days', val:3.1}, {label:'Channel mismatch', val:1.6}, {label:'Segment', val:0.9}, {label:'Send-time mismatch', val:0.6}, {label:'Creative variant', val:0.3}, {label:'Tenure', val:0.2} ],
+  Mass: [ {label:'Channel mismatch', val:1.8}, {label:'Messages in 30 days', val:1.0}, {label:'Send-time mismatch', val:0.7}, {label:'Creative variant', val:0.4}, {label:'Tenure', val:0.3} ],
+  Affluent: [ {label:'Messages in 30 days', val:1.6}, {label:'Channel mismatch', val:1.3}, {label:'Send-time mismatch', val:0.6}, {label:'Creative variant', val:0.3}, {label:'Tenure', val:0.2} ],
+  Prime: [ {label:'Messages in 30 days', val:4.4}, {label:'Channel mismatch', val:1.1}, {label:'Send-time mismatch', val:0.5}, {label:'Creative variant', val:0.2}, {label:'Tenure', val:0.2} ],
+  Private: [ {label:'Messages in 30 days', val:1.9}, {label:'Channel mismatch', val:0.9}, {label:'Send-time mismatch', val:0.5}, {label:'Creative variant', val:0.3}, {label:'Tenure', val:0.2} ]
+};
+var DRIVER_PLAIN = {
+  'Messages in 30 days': 'Messages in 30 days is the number of campaign messages a customer received in the trailing 30 days, across all channels \u2014 in other words, over-contact. Customers who received 7 or more messages in that window show a CTR of 1.4%, against 6.5% for customers who received 1\u20132.',
+  'Channel mismatch': 'Channel mismatch means the message went out on a channel the customer rarely engages with (for example a push notification to someone who mostly responds in-app or by email). These sends get far fewer clicks than sends on the customer\u2019s preferred channel.',
+  'Send-time mismatch': 'Send-time mismatch means the message was sent outside the hours the customer is usually active in the app, so it is seen late or not at all.',
+  'Segment': 'Segment captures baseline differences in how Mass, Affluent, Prime and Private customers respond, after allowing for frequency and channel.',
+  'Creative variant': 'Creative variant is the version of the message design and copy (A/B/C) on the send. Variants perform within a narrow range, so creative is a minor lever.',
+  'Tenure': 'Tenure is how long the customer has banked with SCB; it has only a small effect on response.'
 };
 function renderDriverChart(data){
   var rowH = 36, barH = 26, barStartX = 180, barMaxWidth = 300, leftLabelX = 175;
@@ -2957,6 +3178,10 @@ function renderDriverChart(data){
   svg += '</svg>';
   document.getElementById('driver-chart-container').innerHTML = svg;
   document.getElementById('top-driver-name').textContent = data[0].label;
+  var ratio = data.length > 1 && data[1].val > 0 ? (data[0].val / data[1].val) : null;
+  document.getElementById('top-driver-text').textContent = (DRIVER_PLAIN[data[0].label] || '') +
+    (ratio ? ' This driver alone has about ' + ratio.toFixed(1) + 'x the impact of the next-ranked factor.' : '') +
+    ' This is a model-based ranking of association, not proof of causation \u2014 see Recommendations for how the pilot validates it before scale.';
 }
 function applyRootCauseFilters(){
   var seg = document.getElementById('rc-segment').value;
@@ -2974,15 +3199,25 @@ function updateWhatIf(){
   document.getElementById('wi-time-val').textContent = timeShift + '%';
 
   var baseline = 3.4;
-  var freqGain = Math.max(0, (4.6 - freqCap)) * 0.81;
-  var chanGain = (chanShift / 100) * 1.0;
-  var timeGain = (timeShift / 100) * 0.6;
+  /* within-segment lifts from the Recommendations table, weighted by share of sends */
+  var freqGain = Math.max(0, (7.2 - freqCap)) * (2.1 / 5.2) * 0.40;   /* Prime: +2.1 pts at a cap of 2 (avg freq 7.2) */
+  var chanGain = (chanShift / 100) * 1.0 * 0.20;                      /* Mass: +1.0 pts */
+  var timeGain = (timeShift / 100) * 0.6 * 0.25;                      /* Affluent: +0.6 pts */
   var predicted = baseline + freqGain + chanGain + timeGain;
   var lift = predicted - baseline;
 
   document.getElementById('wi-predicted').textContent = predicted.toFixed(1) + '%';
   document.getElementById('wi-lift').textContent = '+' + lift.toFixed(1) + ' pts';
 }
+
+function setWhatIf(f,c,tm){
+  document.getElementById('wi-freq').value = f;
+  document.getElementById('wi-channel').value = c;
+  document.getElementById('wi-time').value = tm;
+  updateWhatIf();
+}
+function applyRecommended(){ setWhatIf(2,100,100); }
+function resetWhatIf(){ setWhatIf(8,0,0); }
 
 /* ---------- Init ---------- */
 document.addEventListener('DOMContentLoaded', function(){
@@ -2991,9 +3226,10 @@ document.addEventListener('DOMContentLoaded', function(){
     slot.innerHTML = filterBarHTML(prefix);
     updateShowingChip(prefix);
   });
-  document.getElementById('builder-chart-container').innerHTML = '<div class="builder-empty"><div class="builder-empty-icon">&#128202;</div><div class="builder-empty-title">Configure your report above</div><div class="builder-empty-sub">Select at least one dimension and one measure, then Generate Report</div></div>';
+  document.getElementById('builder-chart-container').innerHTML = '<div class="builder-empty"><div class="builder-empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#9d93c4" stroke-width="1.6" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></div><div class="builder-empty-title">Configure your report above</div><div class="builder-empty-sub">Select at least one dimension and one measure, then Generate Report</div></div>';
   renderDriverChart(DRIVER_DATA.All);
   updateWhatIf();
+  applyExploreFilters();
 });
 </script>
 </body>
